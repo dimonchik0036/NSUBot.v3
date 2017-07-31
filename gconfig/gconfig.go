@@ -1,8 +1,10 @@
 package gconfig
 
-import "github.com/dimonchik0036/nsu-bot/schedule"
+import (
+	"github.com/dimonchik0036/nsu-bot/nsuschedule"
+)
 
 type Config struct {
-	Schedule *schedule.Schedule
+	Schedule *nsuschedule.Schedule
 	Weather  *string
 }
