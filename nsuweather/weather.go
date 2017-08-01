@@ -5,9 +5,15 @@ import (
 	"io/ioutil"
 	"net/http"
 	"regexp"
+	"sync"
 )
 
-func GetWeather() (weather string, err error) {
+type Weather struct {
+	Mux     sync.Mutex
+	Weather string
+}
+
+func GetWeather() (string, error) {
 	res, err := http.Get("http://weather.nsu.ru/loadata.php")
 	if err != nil {
 		return "", err
@@ -28,9 +34,26 @@ func GetWeather() (weather string, err error) {
 		return "", err
 	}
 
-	if weather = string(reg.Find(body)); len(weather) < 2 {
+	currentWeather := reg.Find(body)
+	if len(currentWeather) < 2 {
 		return "", errors.New("Weather not found")
 	}
 
-	return weather[1 : len(weather)-1], nil
+	return string(currentWeather), nil
+}
+
+func NewWeather() (weather Weather) {
+	weather.Weather, _ = GetWeather()
+	return
+}
+
+func (weather *Weather) Update() {
+	currentWeather, err := GetWeather()
+	if err != nil {
+		return
+	}
+
+	weather.Mux.Lock()
+	weather.Weather = currentWeather
+	weather.Mux.Unlock()
 }
