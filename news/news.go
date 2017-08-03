@@ -28,6 +28,7 @@ const (
 )
 
 func GetAllSites() (sites Sites) {
+	sites.Sites = append(sites.Sites, PhilosNews()...)
 	sites.Sites = append(sites.Sites, FpNews()...)
 	sites.Sites = append(sites.Sites, MmfNews()...)
 	sites.Sites = append(sites.Sites, FitNews()...)
@@ -110,15 +111,21 @@ func hrefProcessing(body []byte, count int) (result [][][]byte) {
 		return
 	}
 
-	rgHref, err := regexp.Compile("\" ?>")
+	rgTitle, err := regexp.Compile(">")
+	if err != nil {
+		return
+	}
+
+	rgHref, err := regexp.Compile("\"")
 	if err != nil {
 		return
 	}
 
 	for _, href := range rg.FindAll(body, count) {
 		href = href[9 : len(href)-4]
-		begInd := rgHref.FindIndex(href)
-		result = append(result, [][]byte{href[:begInd[0]], href[begInd[1]:]})
+		titleInd := rgTitle.FindIndex(href)
+		hrefInd := rgHref.FindIndex(href)
+		result = append(result, [][]byte{href[:hrefInd[0]], href[titleInd[1]:]})
 	}
 
 	return
