@@ -8,24 +8,28 @@ import (
 const (
 	MmfHref       = "http://mmf.nsu.ru"
 	MmfTimeLayout = "02.01.2006"
+	MmfFuncName   = "mmfname"
 )
 
 func MmfNews() []*Site {
 	return []*Site{
 		&Site{
-			Title:    "Новости",
-			URL:      "/news/index",
-			NewsPage: Mmf,
+			Title:        "Новости",
+			URL:          "/news/index",
+			NewsFunc:     Mmf,
+			NewsFuncName: MmfFuncName,
 		},
 		&Site{
-			Title:    "Объявления",
-			URL:      "/advert/index",
-			NewsPage: Mmf,
+			Title:        "Объявления",
+			URL:          "/advert/index",
+			NewsFunc:     Mmf,
+			NewsFuncName: MmfFuncName,
 		},
 		&Site{
-			Title:    "Объявления студентам",
-			URL:      "/students/advert",
-			NewsPage: Mmf,
+			Title:        "Объявления студентам",
+			URL:          "/students/advert",
+			NewsFunc:     Mmf,
+			NewsFuncName: MmfFuncName,
 		},
 	}
 }

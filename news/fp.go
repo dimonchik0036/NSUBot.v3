@@ -7,14 +7,16 @@ import (
 const (
 	FpHref       = "https://fp.nsu.ru"
 	FpTimeLayout = "02.01.2006"
+	FpFuncName   = "fpname"
 )
 
 func FpNews() []*Site {
 	return []*Site{
 		&Site{
-			Title:    "Все новости",
-			URL:      "/content/news/",
-			NewsPage: Fp,
+			Title:        "Все новости",
+			URL:          "/content/news/",
+			NewsFunc:     Fp,
+			NewsFuncName: FpFuncName,
 		},
 	}
 }

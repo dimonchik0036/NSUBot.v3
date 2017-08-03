@@ -8,14 +8,16 @@ import (
 const (
 	PhilosHref       = "http://philos.nsu.ru/"
 	PhilosTimeLayout = "02.01.2006"
+	PhilosFuncName   = "philosname"
 )
 
 func PhilosNews() []*Site {
 	return []*Site{
 		&Site{
-			Title:    "Новости",
-			URL:      "/left.htm",
-			NewsPage: Philos,
+			Title:        "Новости",
+			URL:          "/left.htm",
+			NewsFunc:     Philos,
+			NewsFuncName: PhilosFuncName,
 		},
 	}
 }

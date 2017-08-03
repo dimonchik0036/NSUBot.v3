@@ -12,15 +12,15 @@ import (
 )
 
 type News struct {
-	ID         int64
-	URL        string
-	Title      string
-	Decryption string
-	Date       int64
+	ID         int64  `json:"id"`
+	URL        string `json:"url"`
+	Title      string `json:"title"`
+	Decryption string `json:"decryption"`
+	Date       int64  `json:"date"`
 }
 
 type Sites struct {
-	Sites []*Site
+	Sites map[string]*Site `json:"sites"`
 }
 
 const (
@@ -28,25 +28,34 @@ const (
 )
 
 func GetAllSites() (sites Sites) {
-	sites.Sites = append(sites.Sites, PhilosNews()...)
-	sites.Sites = append(sites.Sites, FpNews()...)
-	sites.Sites = append(sites.Sites, MmfNews()...)
-	sites.Sites = append(sites.Sites, FitNews()...)
-	sites.Sites = append(sites.Sites, FitChairs()...)
+	sites.Sites = make(map[string]*Site)
+
+	n := NsuNews()
+	n = append(n, PhilosNews()...)
+	n = append(n, FpNews()...)
+	n = append(n, MmfNews()...)
+	n = append(n, FitNews()...)
+	n = append(n, FitChairs()...)
+
+	for _, s := range n {
+		sites.Sites[s.URL] = s
+	}
+
 	return
 }
 
 type Site struct {
-	Mux           sync.Mutex
-	Title         string
-	OptionalTitle string
-	URL           string
-	NewsPage      func(href string, count int) ([]News, error)
-	LastNews      News
+	Mux           sync.Mutex                                   `json:"-"`
+	Title         string                                       `json:"title"`
+	OptionalTitle string                                       `json:"optional_title"`
+	URL           string                                       `json:"url"`
+	NewsFunc      func(href string, count int) ([]News, error) `json:"-"`
+	NewsFuncName  string                                       `json:"news_func_name"`
+	LastNews      News                                         `json:"last_news"`
 }
 
 func (s *Site) Update(countCheck int) (newNews []News, err error) {
-	news, err := s.NewsPage(s.URL, countCheck)
+	news, err := s.NewsFunc(s.URL, countCheck)
 	if err != nil || len(news) == 0 {
 		return newNews, err
 	}
@@ -65,6 +74,25 @@ func (s *Site) Update(countCheck int) (newNews []News, err error) {
 	s.LastNews = news[0]
 
 	return reversNews(newNews), nil
+}
+
+func (s *Site) InitFunc() {
+	switch s.NewsFuncName {
+	case NsuFacFuncName:
+		s.NewsFunc = NsuFac
+	case NsuFuncName:
+		s.NewsFunc = Nsu
+	case FitFuncName:
+		s.NewsFunc = Fit
+	case PhilosFuncName:
+		s.NewsFunc = Philos
+	case MmfFuncName:
+		s.NewsFunc = Mmf
+	case FpFuncName:
+		s.NewsFunc = Fp
+	default:
+		panic("WTF?!")
+	}
 }
 
 func getNewsPage(url string) ([]byte, error) {

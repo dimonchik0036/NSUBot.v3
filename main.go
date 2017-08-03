@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/dimonchik0036/nsu-bot/gconfig"
 	"github.com/dimonchik0036/nsu-bot/news"
@@ -13,10 +14,11 @@ import (
 
 func main() {
 	println("start")
-	sites := news.NewSites()
-
+	sites := news.GetAllSites()
+	b, _ := json.Marshal(sites)
+	println(string(b))
 	for _, s := range sites.Sites {
-		n, err := s.Update(3)
+		n, err := s.Update(2)
 		if err != nil {
 			fmt.Println(err)
 			continue
@@ -24,11 +26,11 @@ func main() {
 		fmt.Println(s.Title)
 		for i := range n {
 			//fmt.Println(n[i])
-			fmt.Println(time.Unix(n[i].Date, 0).Format(news.TimeLayout), n[i].Title)
+			fmt.Println(time.Unix(n[i].Date, 0).Format(news.TimeLayout), "\n"+n[i].Title+" "+n[i].URL+"\n"+n[i].Decryption)
 		}
 		fmt.Println()
 	}
-
+	b, _ = json.Marshal(sites)
 	weather := nsuweather.NewWeather()
 	schedule := nsuschedule.NewSchedule()
 
