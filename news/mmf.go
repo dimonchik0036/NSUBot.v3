@@ -22,6 +22,11 @@ func MmfNews() []*Site {
 			URL:      "/advert/index",
 			NewsPage: Mmf,
 		},
+		&Site{
+			Title:    "Объявления студентам",
+			URL:      "/students/advert",
+			NewsPage: Mmf,
+		},
 	}
 }
 

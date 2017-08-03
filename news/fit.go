@@ -4,7 +4,6 @@ import (
 	"html"
 	"regexp"
 	"strconv"
-	"time"
 )
 
 const (
@@ -89,9 +88,8 @@ func Fit(href string, count int) (news []News, err error) {
 	}
 
 	body = rg.Find(body)
-	hrefs := hrefProcessing(body, count)
 	dates := dateProcessing(body, count, "<td class=\"list-date\">", "</td>", FitTimeLayout)
-	for i, v := range hrefs {
+	for i, v := range hrefProcessing(body, count) {
 		news = append(news, News{
 			ID:    idScan(string(v[0])),
 			Title: html.UnescapeString(string(v[1])),

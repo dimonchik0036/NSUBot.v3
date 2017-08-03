@@ -2,6 +2,7 @@ package news
 
 import (
 	"errors"
+	"golang.org/x/net/html/charset"
 	"io/ioutil"
 	"net/http"
 	"regexp"
@@ -26,7 +27,8 @@ const (
 	TimeLayout = "02.01.2006"
 )
 
-func NewSites() (sites Sites) {
+func GetAllSites() (sites Sites) {
+	sites.Sites = append(sites.Sites, FpNews()...)
 	sites.Sites = append(sites.Sites, MmfNews()...)
 	sites.Sites = append(sites.Sites, FitNews()...)
 	sites.Sites = append(sites.Sites, FitChairs()...)
@@ -51,13 +53,8 @@ func (s *Site) Update(countCheck int) (newNews []News, err error) {
 	s.Mux.Lock()
 	defer s.Mux.Unlock()
 
-	if s.LastNews.ID == 0 {
-		s.LastNews = news[0]
-		return reversNews(news), nil
-	}
-
 	for i := range news {
-		if (s.LastNews.ID >= news[i].ID) && news[i].ID != -1 || s.LastNews.ID == -1 && news[i].ID == -1 && (news[i].URL == s.LastNews.URL) {
+		if (s.LastNews.ID > news[i].ID) && news[i].ID != 0 || (news[i].URL == s.LastNews.URL) && (news[i].Date == s.LastNews.Date) && (news[i].Title == s.LastNews.Title) {
 			break
 		}
 
@@ -81,7 +78,12 @@ func getNewsPage(url string) ([]byte, error) {
 
 	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body)
+	utf8, err := charset.NewReader(res.Body, res.Header.Get("Content-Type"))
+	if err != nil {
+		return []byte{}, err
+	}
+
+	body, err := ioutil.ReadAll(utf8)
 	if err != nil {
 		return []byte{}, err
 	}
