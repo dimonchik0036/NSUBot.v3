@@ -5,7 +5,9 @@ import (
 	"io/ioutil"
 	"net/http"
 	"regexp"
+	"strconv"
 	"sync"
+	"time"
 )
 
 type News struct {
@@ -20,10 +22,15 @@ type Sites struct {
 	Sites []*Site
 }
 
-func NewSites() Sites {
-	return Sites{
-		Sites: append(FitNews(), FitChairs()...),
-	}
+const (
+	TimeLayout = "02.01.2006"
+)
+
+func NewSites() (sites Sites) {
+	sites.Sites = append(sites.Sites, MmfNews()...)
+	sites.Sites = append(sites.Sites, FitNews()...)
+	sites.Sites = append(sites.Sites, FitChairs()...)
+	return
 }
 
 type Site struct {
@@ -92,5 +99,55 @@ func reversNews(news []News) (result []News) {
 		result = append(result, news[len(news)-i-1])
 	}
 
+	return
+}
+
+func hrefProcessing(body []byte, count int) (result [][][]byte) {
+	rg, err := regexp.Compile("<a.*?>.*?</a>")
+	if err != nil {
+		return
+	}
+
+	rgHref, err := regexp.Compile("\" ?>")
+	if err != nil {
+		return
+	}
+
+	for _, href := range rg.FindAll(body, count) {
+		href = href[9 : len(href)-4]
+		begInd := rgHref.FindIndex(href)
+		result = append(result, [][]byte{href[:begInd[0]], href[begInd[1]:]})
+	}
+
+	return
+}
+
+func idScan(url string) int64 {
+	rg, err := regexp.Compile("[\\d]+")
+	if err != nil {
+		return 0
+	}
+
+	id, err := strconv.ParseInt(rg.FindString(url), 10, 64)
+	if err != nil {
+		return 0
+	}
+
+	return id
+}
+
+func dateProcessing(body []byte, count int, begin string, end string, layout string) (dates []int64) {
+	rg, err := regexp.Compile(begin + ".*?" + end)
+	if err != nil {
+		return
+	}
+
+	for _, date := range rg.FindAll(body, count) {
+		t, err := time.Parse(begin+layout+end, string(date))
+		if err != nil {
+			dates = append(dates, 0)
+		}
+		dates = append(dates, t.Unix())
+	}
 	return
 }

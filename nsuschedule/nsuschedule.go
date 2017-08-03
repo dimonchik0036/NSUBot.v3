@@ -3,7 +3,7 @@ package nsuschedule
 import "sync"
 
 type Schedule struct {
-	Mux sync.Mutex
+	Mux      sync.Mutex
 	Schedule map[string]string
 }
 

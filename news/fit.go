@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	FitHref    = "http://fit.nsu.ru"
-	TimeLayout = "02-01-2006"
+	FitHref       = "http://fit.nsu.ru"
+	FitTimeLayout = "02-01-06"
 )
 
 func FitNews() []*Site {
@@ -90,8 +90,7 @@ func Fit(href string, count int) (news []News, err error) {
 
 	body = rg.Find(body)
 	hrefs := hrefProcessing(body, count)
-	dates := dateProcessing(body, count)
-
+	dates := dateProcessing(body, count, "<td class=\"list-date\">", "</td>", FitTimeLayout)
 	for i, v := range hrefs {
 		news = append(news, News{
 			ID:    idScan(string(v[0])),
@@ -128,61 +127,4 @@ func fitNavigationProcessing(body []byte, f func(string, int) ([]News, error)) (
 	}
 
 	return
-}
-
-func hrefProcessing(body []byte, count int) (result [][][]byte) {
-	rg, err := regexp.Compile("<a.*?>.*?</a>")
-	if err != nil {
-		return
-	}
-
-	rgHref, err := regexp.Compile("\" ?>")
-	if err != nil {
-		return
-	}
-
-	for _, href := range rg.FindAll(body, count) {
-		href = href[9 : len(href)-4]
-		begInd := rgHref.FindIndex(href)
-		result = append(result, [][]byte{href[:begInd[0]], href[begInd[1]:]})
-	}
-
-	return
-}
-
-func dateProcessing(body []byte, count int) (dates []int64) {
-	begin := "<td class=\"list-date\">"
-	end := "</td>"
-	rg, err := regexp.Compile(begin + ".*?" + end)
-	if err != nil {
-		return
-	}
-
-	for _, date := range rg.FindAll(body, count) {
-		t, err := time.Parse(begin+"02-01-06"+end, string(date))
-		if err != nil {
-			panic(err)
-		}
-		dates = append(dates, t.Unix())
-	}
-	return
-}
-
-func idScan(url string) int64 {
-	rg, err := regexp.Compile("/[\\d]*?-")
-	if err != nil {
-		return 0
-	}
-
-	idString := rg.FindString(url)
-	if len(idString) < 3 {
-		return -1
-	}
-
-	id, err := strconv.ParseInt(idString[1:len(idString)-1], 10, 64)
-	if err != nil {
-		return 0
-	}
-
-	return id
 }
