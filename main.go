@@ -5,6 +5,7 @@ import (
 	"github.com/dimonchik0036/nsu-bot/telegram-bot"
 	"github.com/dimonchik0036/nsu-bot/vk-bot"
 	"os"
+	"time"
 )
 
 const (
@@ -18,7 +19,7 @@ func main() {
 		return
 	}
 
-	var processing func(core.Config)
+	var processing func(*core.Config)
 	switch os.Args[1] {
 	case "vk":
 		processing = vkbot.Processing
@@ -28,24 +29,26 @@ func main() {
 		print("This PLATFORM not found\n" + Usage)
 		return
 	}
-	config := core.NewConfig()
-	checkConfig(config)
 
+	config := core.LoadConfig()
+	go UpdateSection(config)
 	processing(config)
 }
 
-func checkConfig(config core.Config) {
-	/*for _, s := range config.Sites.Sites {
-		n, err := s.Site.Update(2)
-		if err != nil {
-			fmt.Println(err)
-			continue
+func UpdateSection(config *core.Config) {
+	go func() {
+		for {
+			config.Weather.Update()
+			time.Sleep(2 * time.Minute)
 		}
-		fmt.Println(s.Site.Title)
-		for i := range n {
-			fmt.Println(n[i])
-			//fmt.Println(time.Unix(n[i].Date, 0).Format(news.TimeLayout), "\n"+n[i].Title+" "+n[i].URL+"\n"+n[i].Decryption)
+	}()
+
+	go func() {
+		time.Sleep(20 * time.Second)
+		for {
+			config.Save()
+			time.Sleep(5 * time.Minute)
 		}
-		fmt.Println()
-	}*/
+	}()
+	//config.Sites.Update()
 }

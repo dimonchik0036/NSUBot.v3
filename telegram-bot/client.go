@@ -5,7 +5,7 @@ import (
 	"log"
 )
 
-func Processing(config core.Config) {
+func Processing(config *core.Config) {
 	loadConfig()
 	log.Printf("Телеграм-бот запущен")
 
