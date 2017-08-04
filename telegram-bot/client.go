@@ -6,5 +6,7 @@ import (
 )
 
 func Processing(config gconfig.Config) {
+	loadConfig()
 	log.Printf("Телеграм-бот запущен")
+
 }
