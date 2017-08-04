@@ -4,6 +4,8 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
+	"os"
+	"time"
 )
 
 var AdminID int64
@@ -29,4 +31,13 @@ func loadConfig() {
 	AdminID = tmp.ID
 	BotToken = tmp.Token
 	return
+}
+
+func initLog() {
+	file, err := os.OpenFile("syslog"+time.Now().Format("2006-01-02T04-15-05")+".txt", os.O_CREATE|os.O_WRONLY, os.FileMode(0700))
+	if err != nil {
+		log.Panic(err)
+	}
+
+	log.SetOutput(file)
 }
