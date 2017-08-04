@@ -1,6 +1,8 @@
-package users
+package core
 
-import "sync"
+import (
+	"sync"
+)
 
 const (
 	PlatformTg = "tg"
@@ -8,8 +10,16 @@ const (
 )
 
 type User struct {
-	ID int64 `json:"id"`
-	Platform string `json:"platform"`
+	ID                 int64   `json:"id"`
+	Username           string  `json:"username"`
+	FirstName          string  `json:"first_name"`
+	LastName           string  `json:"last_name"`
+	Platform           string  `json:"platform"`
+	Permission         int     `json:"permission"`
+	DateCreated        int64   `json:"date_created"`
+	DateLastActivities int64   `json:"date_last_activities"`
+	CommandInQueue     bool    `json:"command_in_queue"`
+	Command            Command `json:"command"`
 }
 
 type Key struct {
@@ -25,8 +35,8 @@ type Users struct {
 func (u *Users) SetUser(prefix string, user *User) {
 	u.Mux.Lock()
 	u.Users[Key{
-		Platform:prefix,
-		ID:user.ID,
+		Platform: prefix,
+		ID:       user.ID,
 	}] = user
 	u.Mux.Unlock()
 }

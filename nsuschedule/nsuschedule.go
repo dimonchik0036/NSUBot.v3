@@ -3,12 +3,12 @@ package nsuschedule
 import "sync"
 
 type Schedule struct {
-	Mux      sync.RWMutex
-	Schedule map[string]string
+	Mux      sync.RWMutex      `json:"-"`
+	Schedule map[string]string `json:"schedule"`
 }
 
 func GetAllSchedule() (Schedule, error) {
-	return Schedule{}, nil
+	return NewSchedule(), nil
 }
 
 func NewSchedule() Schedule {

@@ -2,7 +2,6 @@ package news
 
 import (
 	"errors"
-	"github.com/dimonchik0036/nsu-bot/users"
 	"golang.org/x/net/html/charset"
 	"io/ioutil"
 	"net/http"
@@ -20,27 +19,17 @@ type News struct {
 	Date       int64  `json:"date"`
 }
 
-type Sites struct {
-	Sites map[string]*Site `json:"sites"`
-}
-
 const (
 	TimeLayout = "02.01.2006"
 )
 
-func GetAllSites() (sites Sites) {
-	sites.Sites = make(map[string]*Site)
-
-	n := NsuNews()
-	n = append(n, PhilosNews()...)
-	n = append(n, FpNews()...)
-	n = append(n, MmfNews()...)
-	n = append(n, FitNews()...)
-	n = append(n, FitChairs()...)
-
-	for _, s := range n {
-		sites.Sites[s.URL] = s
-	}
+func GetAllSites() (sites []*Site) {
+	sites = append(sites, NsuNews()...)
+	sites = append(sites, PhilosNews()...)
+	sites = append(sites, FpNews()...)
+	sites = append(sites, MmfNews()...)
+	sites = append(sites, FitNews()...)
+	sites = append(sites, FitChairs()...)
 
 	return
 }
@@ -53,7 +42,6 @@ type Site struct {
 	NewsFunc      func(href string, count int) ([]News, error) `json:"-"`
 	NewsFuncName  string                                       `json:"news_func_name"`
 	LastNews      News                                         `json:"last_news"`
-	Users         users.Users                                  `json:"users"`
 }
 
 func (s *Site) Update(countCheck int) (newNews []News, err error) {

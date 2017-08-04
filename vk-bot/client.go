@@ -1,10 +1,10 @@
 package vkbot
 
 import (
-	"github.com/dimonchik0036/nsu-bot/gconfig"
+	"github.com/dimonchik0036/nsu-bot/core"
 	"log"
 )
 
-func Processing(config gconfig.Config) {
+func Processing(config core.Config) {
 	log.Printf("Вк-бот запущен")
 }

@@ -6,12 +6,18 @@ import (
 	"net/http"
 	"regexp"
 	"sync"
+	"time"
 )
 
 type Weather struct {
-	Mux     sync.Mutex
-	Weather string
+	Mux     sync.RWMutex `json:"-"`
+	Weather string       `json:"weather"`
+	Time    int64        `json:"time"`
 }
+
+const (
+	WeatherLayout = "15:04 02.01.06"
+)
 
 func GetWeather() (string, error) {
 	res, err := http.Get("http://weather.nsu.ru/loadata.php")
@@ -44,6 +50,7 @@ func GetWeather() (string, error) {
 
 func NewWeather() (weather Weather) {
 	weather.Weather, _ = GetWeather()
+	weather.Time = time.Now().Unix()
 	return
 }
 
@@ -54,13 +61,14 @@ func (weather *Weather) Update() {
 	}
 
 	weather.Mux.Lock()
+	defer weather.Mux.Unlock()
 	weather.Weather = currentWeather
-	weather.Mux.Unlock()
+	weather.Time = time.Now().Unix()
 }
 
 func (weather *Weather) ShowWeather() (current string) {
-	weather.Mux.Lock()
+	weather.Mux.RLock()
+	defer weather.Mux.RUnlock()
 	current = weather.Weather
-	weather.Mux.Unlock()
 	return
 }
