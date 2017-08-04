@@ -2,6 +2,7 @@ package news
 
 import (
 	"regexp"
+	"strings"
 	"time"
 )
 
@@ -63,7 +64,7 @@ func Philos(href string, count int) (news []News, err error) {
 		news = append(news, News{
 			ID: func() int64 {
 				h := string(href[0][0])
-				if len(h) > 7 && h[:7] == "actual/" {
+				if strings.Contains(h, "actual/") {
 					return idScan(h)
 				}
 				return 0
