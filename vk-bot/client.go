@@ -6,5 +6,6 @@ import (
 )
 
 func Processing(config core.Config) {
+	loadConfig()
 	log.Printf("Вк-бот запущен")
 }
