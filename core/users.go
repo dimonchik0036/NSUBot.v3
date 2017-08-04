@@ -24,49 +24,66 @@ type User struct {
 	Queue               []Command  `json:"queue"`
 }
 
-type Key struct {
-	Platform string `json:"platform"`
-	ID       int64  `json:"id"`
-}
-
 type Users struct {
-	Mux   sync.RWMutex  `json:"-"`
-	Users map[Key]*User `json:"users"`
+	Mux   sync.RWMutex    `json:"-"`
+	Users map[int64]*User `json:"users"`
 }
 
-func (u *Users) SetUser(prefix string, user *User) {
+func (u *Users) SetUser(user *User) {
 	u.Mux.Lock()
-	u.Users[Key{
-		Platform: prefix,
-		ID:       user.ID,
-	}] = user
-	u.Mux.Unlock()
+	defer u.Mux.Unlock()
+	u.Users[user.ID] = user
 }
 
-func (u *Users) SetVkUser(user *User) {
-	u.SetUser(PlatformVk, user)
-}
-
-func (u *Users) SetTgUser(user *User) {
-	u.SetUser(PlatformTg, user)
-}
-
-func (u *Users) PlatformUsers(platform string) (result []*User) {
+func (u *Users) User(id int64) *User {
 	u.Mux.RLock()
 	defer u.Mux.RUnlock()
-	for key, u := range u.Users {
-		if key.Platform == platform {
-			result = append(result, u)
-		}
-	}
-
-	return
+	return u.Users[id]
 }
 
-func (u *Users) TgUsers() []*User {
-	return u.PlatformUsers(PlatformTg)
-}
-
-func (u *Users) VkUsers() []*User {
-	return u.PlatformUsers(PlatformVk)
-}
+//type Key struct {
+//	Platform string `json:"platform"`
+//	ID       int64  `json:"id"`
+//}
+//
+//type Users struct {
+//	Mux   sync.RWMutex  `json:"-"`
+//	Users map[Key]*User `json:"users"`
+//}
+//
+//func (u *Users) SetUser(prefix string, user *User) {
+//	u.Mux.Lock()
+//	u.Users[Key{
+//		Platform: prefix,
+//		ID:       user.ID,
+//	}] = user
+//	u.Mux.Unlock()
+//}
+//
+//func (u *Users) SetVkUser(user *User) {
+//	u.SetUser(PlatformVk, user)
+//}
+//
+//func (u *Users) SetTgUser(user *User) {
+//	u.SetUser(PlatformTg, user)
+//}
+//
+//func (u *Users) PlatformUsers(platform string) (result []*User) {
+//	u.Mux.RLock()
+//	defer u.Mux.RUnlock()
+//	for key, u := range u.Users {
+//		if key.Platform == platform {
+//			result = append(result, u)
+//		}
+//	}
+//
+//	return
+//}
+//
+//func (u *Users) TgUsers() []*User {
+//	return u.PlatformUsers(PlatformTg)
+//}
+//
+//func (u *Users) VkUsers() []*User {
+//	return u.PlatformUsers(PlatformVk)
+//}
