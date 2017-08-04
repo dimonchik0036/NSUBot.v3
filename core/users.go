@@ -10,16 +10,18 @@ const (
 )
 
 type User struct {
-	ID                 int64   `json:"id"`
-	Username           string  `json:"username"`
-	FirstName          string  `json:"first_name"`
-	LastName           string  `json:"last_name"`
-	Platform           string  `json:"platform"`
-	Permission         int     `json:"permission"`
-	DateCreated        int64   `json:"date_created"`
-	DateLastActivities int64   `json:"date_last_activities"`
-	CommandInQueue     bool    `json:"command_in_queue"`
-	Command            Command `json:"command"`
+	ID                  int64      `json:"id"`
+	Username            string     `json:"username"`
+	FirstName           string     `json:"first_name"`
+	LastName            string     `json:"last_name"`
+	Platform            string     `json:"platform"`
+	Permission          int        `json:"permission"`
+	DateCreated         int64      `json:"date_created"`
+	DateLastActivities  int64      `json:"date_last_activities"`
+	ContinuationCommand bool       `json:"command_in_queue"`
+	CurrentCommand      Command    `json:"command"`
+	QueueMux            sync.Mutex `json:"-"`
+	Queue               []Command  `json:"queue"`
 }
 
 type Key struct {
