@@ -4,12 +4,37 @@ import (
 	"github.com/dimonchik0036/nsu-bot/core"
 	"github.com/dimonchik0036/nsu-bot/telegram-bot"
 	"github.com/dimonchik0036/nsu-bot/vk-bot"
+	"os"
+)
+
+const (
+	Usage = "Usage: nsu-bot <PLATFORM>\n" +
+		"PLATFORM is 'vk' or 'tg'"
 )
 
 func main() {
-	println("start")
-	config := core.NewConfig()
+	if len(os.Args) < 2 {
+		print(Usage)
+		return
+	}
 
+	var processing func(core.Config)
+	switch os.Args[1] {
+	case "vk":
+		processing = vkbot.Processing
+	case "tg":
+		processing = tgbot.Processing
+	default:
+		print("This PLATFORM not found\n" + Usage)
+		return
+	}
+	config := core.NewConfig()
+	checkConfig(config)
+
+	processing(config)
+}
+
+func checkConfig(config core.Config) {
 	/*for _, s := range config.Sites.Sites {
 		n, err := s.Site.Update(2)
 		if err != nil {
@@ -23,7 +48,4 @@ func main() {
 		}
 		fmt.Println()
 	}*/
-
-	go vkbot.Processing(config)
-	tgbot.Processing(config)
 }
