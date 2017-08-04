@@ -57,3 +57,10 @@ func (weather *Weather) Update() {
 	weather.Weather = currentWeather
 	weather.Mux.Unlock()
 }
+
+func (weather *Weather) ShowWeather() (current string) {
+	weather.Mux.Lock()
+	current = weather.Weather
+	weather.Mux.Unlock()
+	return
+}

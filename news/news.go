@@ -2,6 +2,7 @@ package news
 
 import (
 	"errors"
+	"github.com/dimonchik0036/nsu-bot/users"
 	"golang.org/x/net/html/charset"
 	"io/ioutil"
 	"net/http"
@@ -52,6 +53,7 @@ type Site struct {
 	NewsFunc      func(href string, count int) ([]News, error) `json:"-"`
 	NewsFuncName  string                                       `json:"news_func_name"`
 	LastNews      News                                         `json:"last_news"`
+	Users         users.Users                                  `json:"users"`
 }
 
 func (s *Site) Update(countCheck int) (newNews []News, err error) {
