@@ -10,10 +10,10 @@ const (
 )
 
 type Command struct {
-	Command    string
-	Args       map[string]string
-	FieldNames []string
-	Sep        string
+	Command    string            `json:"command"`
+	Args       map[string]string `json:"args"`
+	FieldNames []string          `json:"field_names"`
+	Sep        string            `json:"sep"`
 }
 
 func ProcessingInputByFieldNames(input string, command *Command) error {
