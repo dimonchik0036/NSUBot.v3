@@ -45,7 +45,7 @@ func GetWeather() (string, error) {
 		return "", errors.New("Weather not found")
 	}
 
-	return string(currentWeather), nil
+	return string(currentWeather[1 : len(currentWeather)-1]), nil
 }
 
 func NewWeather() (weather Weather) {
@@ -69,6 +69,11 @@ func (weather *Weather) Update() {
 func (weather *Weather) ShowWeather() (current string) {
 	weather.Mux.RLock()
 	defer weather.Mux.RUnlock()
-	current = weather.Weather
-	return
+	return weather.Weather
+}
+
+func (weather *Weather) ShowTime() string {
+	weather.Mux.RLock()
+	defer weather.Mux.RUnlock()
+	return time.Unix(weather.Time, 0).Format(WeatherLayout)
 }
