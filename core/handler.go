@@ -5,7 +5,15 @@ type Handler struct {
 	Handler         func(user *User, command Command)
 }
 
-func CommandHandler(user *User, command Command, commandInterpreter func(string) string, handlers map[string]Handler) {
+type Handlers map[string]Handler
+
+func (h Handlers) AddHandler(handler Handler, key ...string) {
+	for _, v := range key {
+		h[v] = handler
+	}
+}
+
+func CommandHandler(user *User, command Command, commandInterpreter func(string) string, handlers Handlers) {
 	handler, ok := handlers[commandInterpreter(command.Command)]
 	if !ok || !checkHandler(user, handler) {
 		return
