@@ -5,20 +5,20 @@ import (
 	"log"
 )
 
-type Bot struct {
+type BotSt struct {
 	client *vkapi.Client
 }
 
-func NewBot() *Bot {
-	bot, _ := vkapi.NewClientFromToken(BotToken)
-	return &Bot{client: bot}
+func NewBot(token string) *BotSt {
+	bot, _ := vkapi.NewClientFromToken(token)
+	return &BotSt{client: bot}
 }
 
-func (b *Bot) SendMessage(userID int64, text string) {
+func (b *BotSt) SendMessage(userID int64, text string) {
 	b.client.SendMessage(vkapi.MessageConfig{Destination: vkapi.Destination{UserID: userID}, Message: text})
 }
 
-func (b *Bot) UpdateChan() vkapi.LPChan {
+func (b *BotSt) UpdateChan() vkapi.LPChan {
 	if err := b.client.InitLongPoll(0, 2); err != nil {
 		log.Panic(err)
 	}

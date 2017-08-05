@@ -6,11 +6,10 @@ import (
 )
 
 func Processing(config *core.Config) {
-	//initLog() //comment while testing
-	loadConfig()
+	loadVkConfig()
+	initConfig(config)
 	log.Printf("Вк-бот запущен")
-	bot := NewBot()
-	updates := bot.UpdateChan()
+	updates := Bot.UpdateChan()
 
 	for update := range updates {
 		if update.Message == nil || !update.IsNewMessage() || update.Message.Outbox() {
