@@ -6,12 +6,31 @@ import (
 	"github.com/dimonchik0036/nsu-bot/news"
 	"github.com/dimonchik0036/vk-api"
 	"log"
+	"strings"
 	"time"
 )
 
 func RequestHandler(message *vkapi.LPMessage) {
 	user := searchUser(message.FromID)
-	log.Print(user.String(), "пишет: "+message.Text)
+	log.Print(user.String() + " пишет: " + message.Text)
+	MessageHandler(user, message.Text)
+}
+
+func MessageHandler(user *core.User, message string) {
+	if message == "" {
+		return
+	}
+
+	cmd := CommandSelect(user, message)
+	go func() {
+		user.QueueMux.Lock()
+		defer user.QueueMux.Unlock()
+		core.CommandHandler(user, cmd, strings.ToLower, Commands)
+	}()
+}
+
+func CommandSelect(user *core.User, input string) core.Command {
+	return core.SearchCommand(input, " ")
 }
 
 func NewsHandler(users *core.Users, news []news.News) {

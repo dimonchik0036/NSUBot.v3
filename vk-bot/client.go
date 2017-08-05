@@ -8,6 +8,7 @@ import (
 func Processing(config *core.Config) {
 	loadVkConfig()
 	initConfig(config)
+	initCommands()
 	log.Printf("Вк-бот запущен")
 	updates := Bot.UpdateChan()
 
