@@ -5,8 +5,8 @@ type Handler struct {
 	Handler         func(user *User, command Command)
 }
 
-func CommandHandler(user *User, command Command, handlers map[string]Handler) {
-	handler, ok := handlers[command.Command]
+func CommandHandler(user *User, command Command, commandInterpreter func(string) string, handlers map[string]Handler) {
+	handler, ok := handlers[commandInterpreter(command.Command)]
 	if !ok || !checkHandler(user, handler) {
 		return
 	}
