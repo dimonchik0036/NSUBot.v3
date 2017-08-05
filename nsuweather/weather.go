@@ -16,7 +16,7 @@ type Weather struct {
 }
 
 const (
-	WeatherLayout = "15:04 02.01.06"
+	WeatherLayout = "15:04 02.01.2006"
 )
 
 func GetWeather() (string, error) {
