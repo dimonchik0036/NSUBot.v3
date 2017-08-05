@@ -30,7 +30,16 @@ func MessageHandler(user *core.User, message string) {
 }
 
 func CommandSelect(user *core.User, input string) core.Command {
-	return core.SearchCommand(input, " ")
+	if !user.ContinuationCommand {
+		return core.SearchCommand(input, " ")
+	}
+
+	if err := core.ProcessingInputByFieldNames(input, user.CurrentCommand); err != nil {
+		Bot.SendMessage(user.ID, "Произошла непредвиденная ошибка, повторите попытку.")
+		log.Printf(user.String(), "error: ", err.Error())
+	}
+
+	return *user.CurrentCommand
 }
 
 func NewsHandler(users *core.Users, news []news.News) {
