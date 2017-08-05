@@ -29,11 +29,10 @@ type User struct {
 	ContinuationCommand bool       `json:"command_in_queue"`
 	CurrentCommand      *Command   `json:"command"`
 	QueueMux            sync.Mutex `json:"-"`
-	Queue               []*Command `json:"queue"`
 }
 
 func (u *User) String() string {
-	return strconv.FormatInt(u.ID, 10) + ", " + u.Username + ", " + u.FirstName + ", " + u.LastName
+	return strconv.FormatInt(u.ID, 10) + ", " + u.Username + ", " + u.FirstName + " " + u.LastName
 }
 
 func (u *User) NewUserString(usernamePrefix string) string {

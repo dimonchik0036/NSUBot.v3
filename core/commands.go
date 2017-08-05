@@ -12,6 +12,7 @@ const (
 type Command struct {
 	Command    string            `json:"command"`
 	Args       map[string]string `json:"args"`
+	ArgsStr    []string          `json:"args_str"`
 	FieldNames []string          `json:"field_names"`
 	Sep        string            `json:"sep"`
 }
@@ -33,6 +34,14 @@ func ProcessingInputByFieldNames(input string, command *Command) error {
 	return nil
 }
 
+func SearchCommand(input string, sep string) (command Command) {
+	args := strings.Split(input, sep)
+	command.Command = args[0]
+	command.ArgsStr = append(command.ArgsStr, args[1:]...)
+	command.Sep = sep
+	return
+}
+
 func ProcessingInput(input string, sep string) (command Command) {
 	args := strings.Split(input, sep)
 	command.Command = args[0]
@@ -43,6 +52,6 @@ func ProcessingInput(input string, sep string) (command Command) {
 		queryRaw := strings.Split(str, "=")
 		command.Args[queryRaw[0]] = queryRaw[1]
 	}
-
+	command.Sep = sep
 	return
 }
