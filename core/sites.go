@@ -1,27 +1,27 @@
 package core
 
 import (
-	"fmt"
 	"github.com/dimonchik0036/nsu-bot/news"
+	"log"
 )
 
 type Sites struct {
 	Sites []Site `json:"sites"`
 }
 
-func (s *Sites) Update() {
+func (s *Sites) Update(handler func(*Users, []news.News)) {
 	for _, site := range s.Sites {
-		n, err := site.Site.Update(2)
+		news, err := site.Site.Update(5)
 		if err != nil {
-			fmt.Println(err)
+			log.Printf("%s error: %s", site.Site.Title, err.Error())
 			continue
 		}
-		fmt.Println(site.Site.Title)
-		for i := range n {
-			fmt.Println(n[i])
-			//fmt.Println(time.Unix(n[i].Date, 0).Format(news.TimeLayout), "\n"+n[i].Title+" "+n[i].URL+"\n"+n[i].Decryption)
+
+		if len(news) == 0 {
+			continue
 		}
-		fmt.Println()
+
+		go handler(&site.Users, news)
 	}
 }
 
