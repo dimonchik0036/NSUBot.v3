@@ -10,6 +10,7 @@ func Processing(config *core.Config) {
 	loadTgConfig()
 	initConfig(config)
 	initCommands()
+	initAdminCommands()
 	log.Printf("Телеграм-бот запущен")
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60

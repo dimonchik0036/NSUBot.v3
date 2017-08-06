@@ -8,6 +8,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
+	"strconv"
 )
 
 var tgAdminID int64
@@ -16,6 +17,8 @@ var tgUsers *core.Users
 var tgWeather *nsuweather.Weather
 var tgSites *core.Sites
 var tgSchedule *nsuschedule.Schedule
+var globalConfig *core.Config
+var tmpUserList []*core.User
 
 func loadTgConfig() {
 	data, err := ioutil.ReadFile(".tg_config")
@@ -55,4 +58,56 @@ func initConfig(config *core.Config) {
 	tgSites = config.Sites
 	tgSchedule = config.Schedule
 	tgUsers = config.Users
+	globalConfig = config
+}
+
+func sendMessage(user *core.User, command *core.Command, text string, markup *tgbotapi.InlineKeyboardMarkup) {
+	id := checkCallback(command.Args)
+	if id != 0 {
+		msg := tgbotapi.NewEditMessageText(user.ID, id, text)
+		msg.ReplyMarkup = markup
+		tgBot.Send(msg)
+	} else {
+		msg := tgbotapi.NewMessage(user.ID, text)
+		msg.ReplyMarkup = markup
+		tgBot.Send(msg)
+	}
+}
+
+func sendMessageInNewMessage(user *core.User, command *core.Command, text string) {
+	if command.Args == nil {
+		tgBot.Send(tgbotapi.NewMessage(user.ID, text))
+		return
+	}
+
+	if callbackID := command.Args[strCallbackID]; callbackID != "" {
+		msg := tgbotapi.NewEditMessageText(user.ID, int(command.GetArgInt64(strMessageID)), text)
+		markup := tgbotapi.NewInlineKeyboardMarkup(tgbotapi.NewInlineKeyboardRow(backButton(command)))
+		msg.ReplyMarkup = &markup
+		tgBot.Send(msg)
+	} else {
+		tgBot.Send(tgbotapi.NewMessage(user.ID, text))
+	}
+}
+
+func sendError(user *core.User, command *core.Command, text string) {
+	callbackID := command.GetArg(strCallbackID)
+	if callbackID == "" {
+		tgBot.Send(tgbotapi.NewMessage(user.ID, text))
+	} else {
+		tgBot.AnswerCallbackQuery(tgbotapi.NewCallbackWithAlert(callbackID, text))
+	}
+}
+
+func checkCallback(args map[string]string) int {
+	if args == nil {
+		return 0
+	}
+
+	if args[strCallbackID] == "" {
+		return 0
+	}
+
+	id, _ := strconv.Atoi(args[strMessageID])
+	return id
 }

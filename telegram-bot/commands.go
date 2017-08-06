@@ -2,41 +2,122 @@ package tgbot
 
 import (
 	"github.com/dimonchik0036/nsu-bot/core"
+	"github.com/dimonchik0036/nsu-bot/news"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
+	"strconv"
 )
 
 const (
-	strCallbackID = "callbackID"
-	strMessageID  = "messageID"
+	strInNewMessage = "in_new_message"
+	strCmdArg       = "c_a"
+)
+
+const (
+	strCallbackID = "cID"
+	strMessageID  = "mID"
+)
+
+const (
+	strCmdWeather  = "weather"
+	strCmdShowSite = "sh"
 )
 
 var tgCommands core.Handlers
 
 func initCommands() {
 	tgCommands = core.Handlers{}
-	tgCommands.AddHandler(helpHandler(), "help", "помощь")
-}
+	tgCommands.AddHandler(core.Handler{Handler: helpCommand}, "help", "помощь")
 
-func helpHandler() core.Handler {
-	return core.Handler{
-		PermissionLevel: 0,
-		Handler:         helpCommand,
-	}
+	tgCommands.AddHandler(core.Handler{Handler: mainMenuCommand}, strCmdMainMenu)
+
+	tgCommands.AddHandler(core.Handler{Handler: weatherCommand}, strCmdWeather)
+
+	tgCommands.AddHandler(core.Handler{Handler: subMenuCommand}, strCmdSubMenu)
+	tgCommands.AddHandler(core.Handler{Handler: siteMenuCommand}, strCmdSiteMenu)
+	tgCommands.AddHandler(core.Handler{Handler: showSiteCommand}, strCmdShowSite)
 }
 
 func helpCommand(user *core.User, command *core.Command) {
 	defaultHelp := `Список команд:
-	отмена - Прерывает любую цепочку команд.
+	/menu - Вызывает главное меню.
 
-	w | weather | погода | температура - Показывает текущую температуру около НГУ.
+	/cancel - Прерывает любую цепочку команд.
 
-	подписки - Показывает доступные сайты для подписки на рассылку.
 
-	мои подписки - Упраление подписками.
 	По всем вопросам можно обратиться к @dimonchik0036.`
-	if callbackID := command.Args[strCallbackID]; callbackID != "" {
-		tgBot.Send(tgbotapi.NewEditMessageText(user.ID, int(command.GetArgInt64(strMessageID)), defaultHelp))
-	} else {
-		tgBot.Send(tgbotapi.NewMessage(user.ID, defaultHelp))
+
+	sendMessage(user, command, defaultHelp, nil)
+}
+
+func weatherCommand(user *core.User, command *core.Command) {
+	sendMessageInNewMessage(user, command, tgWeather.ShowWeather()+"\n"+
+		"Время последнего обновления: "+tgWeather.ShowTime())
+}
+
+func showSiteCommand(user *core.User, command *core.Command) {
+	args := command.GetArg(strCmdArg)
+	if len(args) < 2 {
+		sendError(user, command, "Мало аргументов")
+		return
 	}
+
+	siteNumber, err := strconv.Atoi(args[:1])
+	if err != nil || siteNumber < 0 || siteNumber > 5 {
+		sendError(user, command, "Диапазон 0-5")
+		return
+	}
+
+	pageNumber, err := strconv.Atoi(args[1:2])
+	if err != nil {
+		sendError(user, command, "Номер страницы неверный")
+		return
+	}
+
+	siteList := news.GetSite(siteNumber)
+	if pageNumber < 0 {
+		pageNumber = 0
+	}
+
+	if pageNumber*5 > len(siteList) {
+		pageNumber = len(siteList) / 5
+	}
+	siteList = siteList[pageNumber*5:]
+
+	if len(args) > 2 {
+		subID, err := strconv.Atoi(args[2:3])
+		if err == nil && subID < len(siteList) {
+			tgSites.ChangeSub(siteList[subID].URL, user)
+		}
+	}
+
+	var markup tgbotapi.InlineKeyboardMarkup
+
+	for i, site := range siteList {
+		if i == 5 {
+			break
+		}
+
+		markup.InlineKeyboard = append(markup.InlineKeyboard, tgbotapi.NewInlineKeyboardRow(tgbotapi.NewInlineKeyboardButtonData(checkSite(site.URL, user)+site.Title, addCommand(strCmdShowSite, args[:2]+strconv.Itoa(i)))))
+	}
+
+	markup.InlineKeyboard = append(markup.InlineKeyboard, tgbotapi.NewInlineKeyboardRow(
+		tgbotapi.NewInlineKeyboardButtonData("«", addCommand(strCmdShowSite, args[:1]+strconv.Itoa(func() int {
+			if pageNumber-1 < 0 {
+				return 0
+			}
+			return pageNumber - 1
+		}()))),
+		tgbotapi.NewInlineKeyboardButtonData("Назад", addCommand(strCmdSiteMenu, "")),
+		tgbotapi.NewInlineKeyboardButtonData("»", addCommand(strCmdShowSite, args[:1]+strconv.Itoa(pageNumber+1))),
+	))
+
+	sendMessage(user, command, "Выберете подписки", &markup)
+}
+
+func checkSite(url string, user *core.User) string {
+	if tgSites.CheckUser(url, user) {
+		return "☑️ "
+	}
+
+	return "❌"
 }

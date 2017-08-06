@@ -1,17 +1,25 @@
 package tgbot
 
 import (
-	"fmt"
 	"github.com/dimonchik0036/nsu-bot/core"
 	"github.com/dimonchik0036/nsu-bot/news"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
 	"log"
+	"strconv"
 	"strings"
 	"time"
 )
 
 func NewsHandler(users *core.Users, news []news.News) {
-	fmt.Println(news)
+	tgUsers := users.TgUsers()
+	for _, user := range tgUsers {
+		for _, n := range news {
+			msg := tgbotapi.NewMessage(user.ID, n.URL+"\n\n*"+n.Title+"*\n\n"+n.Decryption)
+			if _, err := tgBot.Send(msg); err != nil {
+				log.Printf("%s %s", user.String(), err.Error())
+			}
+		}
+	}
 }
 
 func requestHandler(update tgbotapi.Update) {
@@ -50,6 +58,9 @@ func messageHandler(user *core.User, update tgbotapi.Update) {
 		user.QueueMux.Lock()
 		defer user.QueueMux.Unlock()
 		core.CommandHandler(user, cmd, strings.ToLower, tgCommands)
+		if update.CallbackQuery != nil {
+			tgBot.AnswerCallbackQuery(tgbotapi.NewCallback(update.CallbackQuery.ID, ""))
+		}
 	}()
 }
 
@@ -81,7 +92,9 @@ func commandSelectMessage(user *core.User, message *tgbotapi.Message) *core.Comm
 }
 
 func commandSelectCallback(user *core.User, callback *tgbotapi.CallbackQuery) *core.Command {
-	cmd := core.ProcessingInput(callback.Data, ";")
+	cmd := core.UnescapedInput(callback.Data)
+	cmd.SetArg(strCallbackID, callback.ID)
+	cmd.SetArg(strMessageID, strconv.Itoa(callback.Message.MessageID))
 	return &cmd
 }
 
