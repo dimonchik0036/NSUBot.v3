@@ -10,13 +10,13 @@ func Processing(config *core.Config) {
 	initConfig(config)
 	initCommands()
 	log.Printf("Вк-бот запущен")
-	updates := Bot.UpdateChan()
+	updates := vkBot.UpdateChan()
 
 	for update := range updates {
 		if update.Message == nil || !update.IsNewMessage() || update.Message.Outbox() {
 			continue
 		}
 
-		RequestHandler(update.Message)
+		requestHandler(update.Message)
 	}
 }

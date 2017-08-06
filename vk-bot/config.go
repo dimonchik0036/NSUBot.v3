@@ -10,12 +10,12 @@ import (
 	"log"
 )
 
-var AdminID int64
-var Bot *BotSt
-var Users *core.Users
-var Weather *nsuweather.Weather
-var Sites *core.Sites
-var Schedule *nsuschedule.Schedule
+var vkAdminID int64
+var vkBot *botSt
+var vkUsers *core.Users
+var vkWeather *nsuweather.Weather
+var vkSites *core.Sites
+var vkSchedule *nsuschedule.Schedule
 
 func loadVkConfig() {
 	data, err := ioutil.ReadFile(".vk_config")
@@ -34,17 +34,17 @@ func loadVkConfig() {
 		return
 	}
 
-	AdminID = tmp.ID
-	Bot = NewBot(tmp.Token)
-	Bot.client.SetLanguage(vkapi.LangRU)
+	vkAdminID = tmp.ID
+	vkBot = newBot(tmp.Token)
+	vkBot.client.SetLanguage(vkapi.LangRU)
 	return
 }
 
 func initConfig(config *core.Config) {
 	config.Mux.Lock()
 	defer config.Mux.Unlock()
-	Weather = config.Weather
-	Sites = config.Sites
-	Schedule = config.Schedule
-	Users = config.Users
+	vkWeather = config.Weather
+	vkSites = config.Sites
+	vkSchedule = config.Schedule
+	vkUsers = config.Users
 }
