@@ -5,6 +5,7 @@ import (
 	"github.com/dimonchik0036/nsu-bot/news"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -20,6 +21,7 @@ const (
 const (
 	strCmdWeather  = "weather"
 	strCmdShowSite = "sh"
+	strCmdFeedback = "feedback"
 )
 
 var tgCommands core.Handlers
@@ -35,6 +37,7 @@ func initCommands() {
 	tgCommands.AddHandler(core.Handler{Handler: subMenuCommand}, strCmdSubMenu)
 	tgCommands.AddHandler(core.Handler{Handler: siteMenuCommand}, strCmdSiteMenu)
 	tgCommands.AddHandler(core.Handler{Handler: showSiteCommand}, strCmdShowSite)
+	tgCommands.AddHandler(core.Handler{Handler: feedbackCommand}, strCmdFeedback)
 }
 
 func helpCommand(user *core.User, command *core.Command) {
@@ -47,6 +50,19 @@ func helpCommand(user *core.User, command *core.Command) {
 	По всем вопросам можно обратиться к @dimonchik0036.`
 
 	sendMessage(user, command, defaultHelp, nil)
+}
+
+func feedbackCommand(user *core.User, command *core.Command) {
+	if len(command.ArgsStr) == 0 {
+		user.ContinuationCommand = true
+		user.CurrentCommand = command
+		command.FieldNames = []string{"text"}
+		sendError(user, command, "Наберите свой отзыв")
+		return
+	}
+
+	tgBot.Send(tgbotapi.NewMessage(tgAdminID, "Получен отзыв от\n"+user.FullString("@")+"\n\n"+strings.Join(command.ArgsStr, " ")))
+	tgBot.Send(tgbotapi.NewMessage(user.ID, "Спасибо за отзыв!"))
 }
 
 func weatherCommand(user *core.User, command *core.Command) {

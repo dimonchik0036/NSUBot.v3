@@ -23,6 +23,9 @@ func mainMenuCommand(user *core.User, command *core.Command) {
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData("Управление подписками", addCommand(strCmdSubMenu, "")),
 		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("Оставить отзыв", addCommand(strCmdFeedback, "")),
+		),
 	)
 
 	sendMessage(user, command, "Главное меню", &markup)
