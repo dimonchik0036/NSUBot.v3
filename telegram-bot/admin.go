@@ -9,12 +9,12 @@ import (
 )
 
 const (
-	strCmdReset      = "reset"
-	strCmdAdminMenu  = "admin"
-	strCmdDelMessage = "dm"
-	strCmdUserList   = "ulist"
-	strCmdShowUser   = "suser"
-	strCmdSendMessage = "usend"
+	strCmdReset          = "reset"
+	strCmdAdminMenu      = "admin"
+	strCmdDelMessage     = "dm"
+	strCmdUserList       = "ulist"
+	strCmdShowUser       = "suser"
+	strCmdSendMessage    = "usend"
 	strCmdSendMessageAll = "sendall"
 )
 
@@ -52,13 +52,13 @@ func initAdminCommands() {
 	}, strCmdShowUser)
 
 	tgCommands.AddHandler(core.Handler{
-		Handler:adminSendMessageUser,
-		PermissionLevel:core.PermissionAdmin,
+		Handler:         adminSendMessageUser,
+		PermissionLevel: core.PermissionAdmin,
 	}, strCmdSendMessage)
 
 	tgCommands.AddHandler(core.Handler{
-		Handler:adminSendMessageAll,
-		PermissionLevel:core.PermissionAdmin,
+		Handler:         adminSendMessageAll,
+		PermissionLevel: core.PermissionAdmin,
 	}, strCmdSendMessageAll)
 }
 
@@ -153,7 +153,7 @@ func adminUserListCommand(user *core.User, command *core.Command) {
 		tgbotapi.NewInlineKeyboardButtonData("»", addCommand(strCmdUserList, strconv.Itoa(pageNumber+1))),
 	))
 
-	sendMessage(user, command, "Выберете подписки", &markup)
+	sendMessage(user, command, "Выберете пользователя", &markup)
 }
 
 func adminShowUser(user *core.User, command *core.Command) {
@@ -172,7 +172,7 @@ func adminShowUser(user *core.User, command *core.Command) {
 
 	markup := tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-		tgbotapi.NewInlineKeyboardButtonData("Отправить сообщение", core.GenerateCommandString(strCmdSendMessage, map[string]string{"id":strconv.FormatInt(id, 10)})),
+			tgbotapi.NewInlineKeyboardButtonData("Отправить сообщение", core.GenerateCommandString(strCmdSendMessage, map[string]string{"id": strconv.FormatInt(id, 10)})),
 		),
 		tgbotapi.NewInlineKeyboardRow(
 			backButton(command),

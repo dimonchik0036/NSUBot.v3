@@ -30,7 +30,7 @@ func initCommands() {
 	tgCommands = core.Handlers{}
 	tgCommands.AddHandler(core.Handler{Handler: helpCommand}, "help", "помощь")
 
-	tgCommands.AddHandler(core.Handler{Handler: mainMenuCommand}, strCmdMainMenu)
+	tgCommands.AddHandler(core.Handler{Handler: mainMenuCommand}, strCmdMainMenu, "start")
 
 	tgCommands.AddHandler(core.Handler{Handler: weatherCommand}, strCmdWeather)
 

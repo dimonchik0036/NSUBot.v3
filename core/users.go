@@ -32,7 +32,7 @@ type User struct {
 }
 
 func (u *User) String() string {
-	return strconv.FormatInt(u.ID, 10) + ", " + u.Username + ", " + u.FirstName + " " + u.LastName
+	return u.Platform+strconv.FormatInt(u.ID, 10) + ", " + u.Username + ", " + u.FirstName + " " + u.LastName
 }
 
 func (u *User) NewUserString(usernamePrefix string) string {
