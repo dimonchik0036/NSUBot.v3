@@ -34,6 +34,40 @@ func GetAllSites() (sites []*Site) {
 	return
 }
 
+const (
+	FitNumber = iota
+	NsuNumber
+	MmfNumber
+	FpNumber
+	PhilosNumber
+)
+
+func GetSiteList() (list [][]*Site) {
+	list = append(list, FitNews(), FitChairs())
+	list = append(list, NsuNews())
+	list = append(list, MmfNews())
+	list = append(list, FpNews())
+	list = append(list, PhilosNews())
+	return list
+}
+
+func GetSite(number int) []*Site {
+	switch number {
+	case 0:
+		return append(FitNews(), FitChairs()...)
+	case 1:
+		return NsuNews()
+	case 2:
+		return MmfNews()
+	case 3:
+		return FpNews()
+	case 4:
+		return PhilosNews()
+	default:
+		return []*Site{}
+	}
+}
+
 type Site struct {
 	Mux           sync.Mutex                                   `json:"-"`
 	Title         string                                       `json:"title"`

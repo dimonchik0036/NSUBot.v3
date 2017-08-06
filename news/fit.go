@@ -63,30 +63,35 @@ func FitChairs() []*Site {
 	return []*Site{
 		&Site{
 			Title:        "Объявления кафедры систем информатики",
+			URL:          FitHref + "/chairs/ksi/anksi",
 			OptionalURL:  "/chairs/ksi/anksi",
 			NewsFunc:     Fit,
 			NewsFuncName: FitFuncName,
 		},
 		&Site{
 			Title:        "Объявления кафедры компьютерных систем",
+			URL:          FitHref + "/chairs/kks/ankks",
 			OptionalURL:  "/chairs/kks/ankks",
 			NewsFunc:     Fit,
 			NewsFuncName: FitFuncName,
 		},
 		&Site{
 			Title:        "Объявления кафедры общей информатики",
+			URL:          FitHref + "/chairs/koi/koinews",
 			OptionalURL:  "/chairs/koi/koinews",
 			NewsFunc:     Fit,
 			NewsFuncName: FitFuncName,
 		},
 		&Site{
 			Title:        "Объявления кафедры параллельных вычислений",
+			URL:          FitHref + "/chairs/kpv/kpvnews",
 			OptionalURL:  "/chairs/kpv/kpvnews",
 			NewsFunc:     Fit,
 			NewsFuncName: FitFuncName,
 		},
 		&Site{
 			Title:        "Объявления кафедры компьютерных технологий",
+			URL:          FitHref + "/chairs/k-kt/kktnews",
 			OptionalURL:  "/chairs/k-kt/kktnews",
 			NewsFunc:     Fit,
 			NewsFuncName: FitFuncName,
