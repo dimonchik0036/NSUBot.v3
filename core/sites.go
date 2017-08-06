@@ -3,10 +3,36 @@ package core
 import (
 	"github.com/dimonchik0036/nsu-bot/news"
 	"log"
+	"sync"
 )
 
 type Sites struct {
-	Sites []Site `json:"sites"`
+	Mux   sync.RWMutex
+	Sites map[string]*Site `json:"sites"`
+}
+
+func (s *Sites) Sub(href string, user *User) {
+	s.Mux.RLock()
+	defer s.Mux.RUnlock()
+	site := s.Sites[href]
+	if site == nil {
+		log.Printf("%s wtf?!?! href %s not found", user.String(), href)
+		return
+	}
+
+	site.Users.SetUser(user.Platform, user)
+}
+
+func (s *Sites) Unsub(href string, user *User) {
+	s.Mux.RLock()
+	defer s.Mux.RUnlock()
+	site := s.Sites[href]
+	if site == nil {
+		log.Printf("%s wtf?!?! href %s not found", user.String(), href)
+		return
+	}
+
+	site.Users.DelUser(user.Platform, user.ID)
 }
 
 func (s *Sites) Update(handler func(*Users, []news.News)) {
@@ -31,9 +57,10 @@ type Site struct {
 }
 
 func NewSites() (sites Sites) {
+	sites.Sites = map[string]*Site{}
 	s := news.GetAllSites()
 	for _, site := range s {
-		sites.Sites = append(sites.Sites, Site{Site: site, Users: Users{}})
+		sites.Sites[site.URL] = &Site{Site: site, Users: Users{}}
 	}
 	return
 }
