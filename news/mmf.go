@@ -15,19 +15,22 @@ func MmfNews() []*Site {
 	return []*Site{
 		&Site{
 			Title:        "Новости",
-			URL:          "/news/index",
+			URL:          MmfHref + "/news/index",
+			OptionalURL:  "/news/index",
 			NewsFunc:     Mmf,
 			NewsFuncName: MmfFuncName,
 		},
 		&Site{
 			Title:        "Объявления",
-			URL:          "/advert/index",
+			URL:          MmfHref + "/advert/index",
+			OptionalURL:  "/advert/index",
 			NewsFunc:     Mmf,
 			NewsFuncName: MmfFuncName,
 		},
 		&Site{
 			Title:        "Объявления студентам",
-			URL:          "/students/advert",
+			URL:          MmfHref + "/students/advert",
+			OptionalURL:  "/students/advert",
 			NewsFunc:     Mmf,
 			NewsFuncName: MmfFuncName,
 		},

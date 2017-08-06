@@ -16,37 +16,43 @@ func FitNews() []*Site {
 	return []*Site{
 		&Site{
 			Title:        "События",
-			URL:          "/news/news",
+			URL:          FitHref + "/news/news",
+			OptionalURL:  "/news/news",
 			NewsFunc:     Fit,
 			NewsFuncName: FitFuncName,
 		},
 		&Site{
 			Title:        "Объявления",
-			URL:          "/news/announc",
+			URL:          FitHref + "/news/announc",
+			OptionalURL:  "/news/announc",
 			NewsFunc:     Fit,
 			NewsFuncName: FitFuncName,
 		},
 		&Site{
 			Title:        "Конференции",
-			URL:          "/news/konf",
+			URL:          FitHref + "/news/konf",
+			OptionalURL:  "/news/konf",
 			NewsFunc:     Fit,
 			NewsFuncName: FitFuncName,
 		},
 		&Site{
 			Title:        "Конкурсы",
-			URL:          "/news/conc",
+			URL:          FitHref + "/news/conc",
+			OptionalURL:  "/news/conc",
 			NewsFunc:     Fit,
 			NewsFuncName: FitFuncName,
 		},
 		&Site{
 			Title:        "Вакансии",
-			URL:          "/news/vac",
+			URL:          FitHref + "/news/vac",
+			OptionalURL:  "/news/vac",
 			NewsFunc:     Fit,
 			NewsFuncName: FitFuncName,
 		},
 		&Site{
 			Title:        "Административные приказы",
-			URL:          "/news/administrativnye-prikazy",
+			URL:          FitHref + "/news/administrativnye-prikazy",
+			OptionalURL:  "/news/administrativnye-prikazy",
 			NewsFunc:     Fit,
 			NewsFuncName: FitFuncName,
 		},
@@ -57,31 +63,31 @@ func FitChairs() []*Site {
 	return []*Site{
 		&Site{
 			Title:        "Объявления кафедры систем информатики",
-			URL:          "/chairs/ksi/anksi",
+			OptionalURL:  "/chairs/ksi/anksi",
 			NewsFunc:     Fit,
 			NewsFuncName: FitFuncName,
 		},
 		&Site{
 			Title:        "Объявления кафедры компьютерных систем",
-			URL:          "/chairs/kks/ankks",
+			OptionalURL:  "/chairs/kks/ankks",
 			NewsFunc:     Fit,
 			NewsFuncName: FitFuncName,
 		},
 		&Site{
 			Title:        "Объявления кафедры общей информатики",
-			URL:          "/chairs/koi/koinews",
+			OptionalURL:  "/chairs/koi/koinews",
 			NewsFunc:     Fit,
 			NewsFuncName: FitFuncName,
 		},
 		&Site{
 			Title:        "Объявления кафедры параллельных вычислений",
-			URL:          "/chairs/kpv/kpvnews",
+			OptionalURL:  "/chairs/kpv/kpvnews",
 			NewsFunc:     Fit,
 			NewsFuncName: FitFuncName,
 		},
 		&Site{
 			Title:        "Объявления кафедры компьютерных технологий",
-			URL:          "/chairs/k-kt/kktnews",
+			OptionalURL:  "/chairs/k-kt/kktnews",
 			NewsFunc:     Fit,
 			NewsFuncName: FitFuncName,
 		},
@@ -130,9 +136,9 @@ func FitNavigation(href string) ([]*Site, error) {
 func fitNavigationProcessing(body []byte, f func(string, int) ([]News, error)) (sites []*Site) {
 	for _, b := range hrefProcessing(body, -1) {
 		sites = append(sites, &Site{
-			URL:      string(b[0]),
-			Title:    string(b[1]),
-			NewsFunc: f,
+			OptionalURL: string(b[0]),
+			Title:       string(b[1]),
+			NewsFunc:    f,
 		})
 	}
 

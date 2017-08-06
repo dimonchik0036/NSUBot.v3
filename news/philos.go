@@ -16,7 +16,8 @@ func PhilosNews() []*Site {
 	return []*Site{
 		&Site{
 			Title:        "Новости",
-			URL:          "/left.htm",
+			URL:          PhilosHref + "/left.htm",
+			OptionalURL:  "/left.htm",
 			NewsFunc:     Philos,
 			NewsFuncName: PhilosFuncName,
 		},

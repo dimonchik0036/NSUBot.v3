@@ -38,7 +38,8 @@ func NsuNews() []*Site {
 func NsuFIT() *Site {
 	return &Site{
 		Title:        "ФИТ",
-		URL:          "/fit",
+		URL:          NsuHref + "/fit",
+		OptionalURL:  "/fit",
 		NewsFunc:     NsuFac,
 		NewsFuncName: NsuFacFuncName,
 	}
@@ -47,7 +48,8 @@ func NsuFIT() *Site {
 func NsuGGF() *Site {
 	return &Site{
 		Title:        "ГГФ",
-		URL:          "/ggf",
+		URL:          NsuHref + "/ggf",
+		OptionalURL:  "/ggf",
 		NewsFunc:     NsuFac,
 		NewsFuncName: NsuFacFuncName,
 	}
@@ -56,7 +58,8 @@ func NsuGGF() *Site {
 func NsuIH() *Site {
 	return &Site{
 		Title:        "Гуманитарный институт",
-		URL:          "/ih",
+		URL:          NsuHref + "/ih",
+		OptionalURL:  "/ih",
 		NewsFunc:     NsuFac,
 		NewsFuncName: NsuFacFuncName,
 	}
@@ -65,7 +68,8 @@ func NsuIH() *Site {
 func NsuHistory() *Site {
 	return &Site{
 		Title:        "История",
-		URL:          "/ist",
+		URL:          NsuHref + "/ist",
+		OptionalURL:  "/ist",
 		NewsFunc:     NsuFac,
 		NewsFuncName: NsuFacFuncName,
 	}
@@ -74,7 +78,8 @@ func NsuHistory() *Site {
 func NsuFundLing() *Site {
 	return &Site{
 		Title:        "Фундаментальная и прикладная лингвистика",
-		URL:          "/fund_ling",
+		URL:          NsuHref + "/fund_ling",
+		OptionalURL:  "/fund_ling",
 		NewsFunc:     NsuFac,
 		NewsFuncName: NsuFacFuncName,
 	}
@@ -83,7 +88,8 @@ func NsuFundLing() *Site {
 func NsuLing() *Site {
 	return &Site{
 		Title:        "Лингвистика",
-		URL:          "/ling",
+		URL:          NsuHref + "/ling",
+		OptionalURL:  "/ling",
 		NewsFunc:     NsuFac,
 		NewsFuncName: NsuFacFuncName,
 	}
@@ -92,7 +98,8 @@ func NsuLing() *Site {
 func NsuJourn() *Site {
 	return &Site{
 		Title:        "Журналистика",
-		URL:          "/journ",
+		URL:          NsuHref + "/journ",
+		OptionalURL:  "/journ",
 		NewsFunc:     NsuFac,
 		NewsFuncName: NsuFacFuncName,
 	}
@@ -101,7 +108,8 @@ func NsuJourn() *Site {
 func NsuMed() *Site {
 	return &Site{
 		Title:        "ИМП (Здравоохранение)",
-		URL:          "/med",
+		URL:          NsuHref + "/med",
+		OptionalURL:  "/med",
 		NewsFunc:     NsuFac,
 		NewsFuncName: NsuFacFuncName,
 	}
@@ -110,7 +118,8 @@ func NsuMed() *Site {
 func NsuUF() *Site {
 	return &Site{
 		Title:        "ИФП (Юриспруденция)",
-		URL:          "/uf",
+		URL:          NsuHref + "/uf",
+		OptionalURL:  "/uf",
 		NewsFunc:     NsuFac,
 		NewsFuncName: NsuFacFuncName,
 	}
@@ -120,7 +129,8 @@ func NsuUF() *Site {
 func NsuPhilf() *Site {
 	return &Site{
 		Title:        "ИФП (Философия)",
-		URL:          "/philf",
+		URL:          NsuHref + "/philf",
+		OptionalURL:  "/philf",
 		NewsFunc:     NsuFac,
 		NewsFuncName: NsuFacFuncName,
 	}
@@ -129,7 +139,8 @@ func NsuPhilf() *Site {
 func NsuMMF() *Site {
 	return &Site{
 		Title:        "ММФ",
-		URL:          "/mmf",
+		URL:          NsuHref + "/mmf",
+		OptionalURL:  "/mmf",
 		NewsFunc:     NsuFac,
 		NewsFuncName: NsuFacFuncName,
 	}
@@ -138,7 +149,8 @@ func NsuMMF() *Site {
 func NsuFEN() *Site {
 	return &Site{
 		Title:        "ФЕН",
-		URL:          "/fen",
+		URL:          NsuHref + "/fen",
+		OptionalURL:  "/fen",
 		NewsFunc:     NsuFac,
 		NewsFuncName: NsuFacFuncName,
 	}
@@ -147,7 +159,8 @@ func NsuFEN() *Site {
 func NsuFF() *Site {
 	return &Site{
 		Title:        "ФФ",
-		URL:          "/ff",
+		URL:          NsuHref + "/ff",
+		OptionalURL:  "/ff",
 		NewsFunc:     NsuFac,
 		NewsFuncName: NsuFacFuncName,
 	}
@@ -156,7 +169,8 @@ func NsuFF() *Site {
 func NsuEF() *Site {
 	return &Site{
 		Title:        "ЭФ",
-		URL:          "/ef",
+		URL:          NsuHref + "/ef",
+		OptionalURL:  "/ef",
 		NewsFunc:     NsuFac,
 		NewsFuncName: NsuFacFuncName,
 	}
@@ -165,7 +179,8 @@ func NsuEF() *Site {
 func NsuAnnounce() *Site {
 	return &Site{
 		Title:        "События",
-		URL:          "/news?mnc.news.type=announce",
+		URL:          NsuHref + "/news?mnc.news.type=announce",
+		OptionalURL:  "/news?mnc.news.type=announce",
 		NewsFunc:     Nsu,
 		NewsFuncName: NsuFuncName,
 	}
@@ -174,7 +189,8 @@ func NsuAnnounce() *Site {
 func NsuReportage() *Site {
 	return &Site{
 		Title:        "Репортажи",
-		URL:          "/news?mnc.news.type=reportage",
+		URL:          NsuHref + "/news?mnc.news.type=reportage",
+		OptionalURL:  "/news?mnc.news.type=reportage",
 		NewsFunc:     Nsu,
 		NewsFuncName: NsuFuncName,
 	}
@@ -183,7 +199,8 @@ func NsuReportage() *Site {
 func NsuInterview() *Site {
 	return &Site{
 		Title:        "Интервью",
-		URL:          "/news?mnc.news.type=interview",
+		URL:          NsuHref + "/news?mnc.news.type=interview",
+		OptionalURL:  "/news?mnc.news.type=interview",
 		NewsFunc:     Nsu,
 		NewsFuncName: NsuFuncName,
 	}

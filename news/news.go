@@ -39,13 +39,14 @@ type Site struct {
 	Title         string                                       `json:"title"`
 	OptionalTitle string                                       `json:"optional_title"`
 	URL           string                                       `json:"url"`
+	OptionalURL   string                                       `json:"option_url"`
 	NewsFunc      func(href string, count int) ([]News, error) `json:"-"`
 	NewsFuncName  string                                       `json:"news_func_name"`
 	LastNews      News                                         `json:"last_news"`
 }
 
 func (s *Site) Update(countCheck int) (newNews []News, err error) {
-	news, err := s.NewsFunc(s.URL, countCheck)
+	news, err := s.NewsFunc(s.OptionalURL, countCheck)
 	if err != nil || len(news) == 0 {
 		return newNews, err
 	}

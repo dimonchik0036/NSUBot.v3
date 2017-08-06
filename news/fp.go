@@ -14,7 +14,8 @@ func FpNews() []*Site {
 	return []*Site{
 		&Site{
 			Title:        "Все новости",
-			URL:          "/content/news/",
+			URL:          FpHref + "/content/news/",
+			OptionalURL:  "/content/news/",
 			NewsFunc:     Fp,
 			NewsFuncName: FpFuncName,
 		},

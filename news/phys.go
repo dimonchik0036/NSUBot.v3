@@ -26,7 +26,7 @@ const (
 		news = append(news, News{
 			ID:    idScan(string(v[0])),
 			Title: html.UnescapeString(string(v[1])),
-			URL:   PhysHref + string(v[0]),
+			OptionalURL:   PhysHref + string(v[0]),
 		})
 	}
 
