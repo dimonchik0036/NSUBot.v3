@@ -11,6 +11,7 @@ const (
 
 type Command struct {
 	Command    string            `json:"command"`
+	MoreArgs   bool              `json:"more_args"`
 	Args       map[string]string `json:"args"`
 	ArgsStr    []string          `json:"args_str"`
 	FieldNames []string          `json:"field_names"`
@@ -19,6 +20,11 @@ type Command struct {
 
 func ProcessingInputByFieldNames(input string, command *Command) error {
 	args := strings.Split(input, command.Sep)
+	if command.MoreArgs {
+		command.ArgsStr = args
+		return nil
+	}
+
 	if len(args) < len(command.FieldNames) {
 		return errors.New("Args len smaller fields len")
 	}
