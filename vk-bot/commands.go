@@ -69,7 +69,7 @@ func weatherHandler() core.Handler {
 
 func weatherCommand(user *core.User, command *core.Command) {
 	vkBot.SendMessage(user.ID, vkWeather.ShowWeather()+"\n"+
-		"Время последнего обновления: "+ vkWeather.ShowTime())
+		"Время последнего обновления: "+vkWeather.ShowTime())
 }
 
 func helpHandler() core.Handler {
