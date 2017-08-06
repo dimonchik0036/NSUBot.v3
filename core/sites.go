@@ -11,6 +11,22 @@ type Sites struct {
 	Sites map[string]*Site `json:"sites"`
 }
 
+func (s *Sites) ChangeSub(href string, user *User) {
+	s.Mux.RLock()
+	defer s.Mux.RUnlock()
+	site := s.Sites[href]
+	if site == nil {
+		log.Printf("%s wtf?!?! href %s not found", user.String(), href)
+		return
+	}
+
+	if site.Users.User(user.Platform, user.ID) == nil {
+		site.Users.SetUser(user.Platform, user)
+	} else {
+		site.Users.DelUser(user.Platform, user.ID)
+	}
+}
+
 func (s *Sites) Sub(href string, user *User) {
 	s.Mux.RLock()
 	defer s.Mux.RUnlock()
@@ -33,6 +49,22 @@ func (s *Sites) Unsub(href string, user *User) {
 	}
 
 	site.Users.DelUser(user.Platform, user.ID)
+}
+
+func (s *Sites) CheckUser(href string, user *User) bool {
+	s.Mux.RLock()
+	defer s.Mux.RUnlock()
+	site := s.Sites[href]
+	if site == nil {
+		log.Printf("%s wtf?!?! href %s not found", user.String(), href)
+		return false
+	}
+
+	if site.Users.User(user.Platform, user.ID) != nil {
+		return true
+	}
+
+	return false
 }
 
 func (s *Sites) Update(handler func(*Users, []news.News)) {

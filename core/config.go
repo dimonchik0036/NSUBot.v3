@@ -45,6 +45,15 @@ func (c *Config) Save() {
 	saveSites(c.Sites)
 }
 
+func (c *Config) Reset() {
+	saveWeather(c.Weather)
+	saveUsers(c.Users)
+	saveSites(c.Sites)
+	c.Mux.Lock()
+	log.Print("Выключаюсь")
+	os.Exit(0)
+}
+
 func saveAndMarshal(filename string, v interface{}) error {
 	data, err := json.Marshal(v)
 	if err != nil {

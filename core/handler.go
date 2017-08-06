@@ -1,5 +1,7 @@
 package core
 
+import "log"
+
 type Handler struct {
 	PermissionLevel int
 	Handler         func(user *User, command *Command)
@@ -15,7 +17,12 @@ func (h Handlers) AddHandler(handler Handler, key ...string) {
 
 func CommandHandler(user *User, command *Command, commandInterpreter func(string) string, handlers Handlers) {
 	handler, ok := handlers[commandInterpreter(command.Command)]
-	if !ok || !checkHandler(user, handler) {
+	if !ok {
+		return
+	}
+
+	if !checkHandler(user, handler) {
+		log.Printf("%s пакостит.", user.String())
 		return
 	}
 

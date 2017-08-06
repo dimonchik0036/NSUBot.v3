@@ -43,6 +43,16 @@ func (u *User) NewUserString(usernamePrefix string) string {
 		"Дата регистрации: %s", u.ID, usernamePrefix+u.Username, u.FirstName, u.LastName, time.Unix(u.DateCreated, 0).Format(UserLayout))
 }
 
+func (u *User) FullString(usernamePrefix string) string {
+	return fmt.Sprintf("ID:%d\n"+
+		"Ник: %s\n"+
+		"Имя: %s\n"+
+		"Фамилия: %s\n"+
+		"Дата регистрации: %s\n"+
+		"Последняя активность: %s\n"+
+		"Уровень допуска: %d", u.ID, usernamePrefix+u.Username, u.FirstName, u.LastName, time.Unix(u.DateCreated, 0).Format(UserLayout), time.Unix(u.DateLastActivities, 0).Format(UserLayout), u.Permission)
+}
+
 func key(prefix string, id int64) string {
 	return prefix + strconv.FormatInt(id, 10)
 }
@@ -50,6 +60,11 @@ func key(prefix string, id int64) string {
 type Users struct {
 	Mux   sync.RWMutex     `json:"-"`
 	Users map[string]*User `json:"users"`
+}
+
+func (u *Users) ChangePermission(platform string, id int64, permission int) {
+	user := u.User(platform, id)
+	user.Permission = permission
 }
 
 func (u *Users) DelUser(prefix string, id int64) {

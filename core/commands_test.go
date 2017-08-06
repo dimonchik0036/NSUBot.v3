@@ -39,3 +39,17 @@ func TestProcessingInput(t *testing.T) {
 		t.FailNow()
 	}
 }
+
+func TestCommand_String(t *testing.T) {
+	var cmd Command
+	cmd.Command = "hey!;"
+	cmd.Args = map[string]string{
+		"dfs _; 23y 98":       "dse 4s6&tt",
+		"ffd; sf_ _fs; ; ;  ": "sf",
+	}
+	fmt.Println(cmd)
+	strCmd := cmd.Encode()
+	fmt.Println(strCmd)
+	newCmd := UnescapedInput(strCmd)
+	fmt.Println(newCmd)
+}
