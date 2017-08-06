@@ -2,7 +2,7 @@ package core
 
 type Handler struct {
 	PermissionLevel int
-	Handler         func(user *User, command Command)
+	Handler         func(user *User, command *Command)
 }
 
 type Handlers map[string]Handler
@@ -13,7 +13,7 @@ func (h Handlers) AddHandler(handler Handler, key ...string) {
 	}
 }
 
-func CommandHandler(user *User, command Command, commandInterpreter func(string) string, handlers Handlers) {
+func CommandHandler(user *User, command *Command, commandInterpreter func(string) string, handlers Handlers) {
 	handler, ok := handlers[commandInterpreter(command.Command)]
 	if !ok || !checkHandler(user, handler) {
 		return
