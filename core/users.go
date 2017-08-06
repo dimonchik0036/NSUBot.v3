@@ -52,6 +52,12 @@ type Users struct {
 	Users map[string]*User `json:"users"`
 }
 
+func (u *Users) DelUser(prefix string, id int64) {
+	u.Mux.Lock()
+	defer u.Mux.Unlock()
+	delete(u.Users, key(prefix, id))
+}
+
 func (u *Users) User(prefix string, id int64) *User {
 	u.Mux.RLock()
 	defer u.Mux.RUnlock()
