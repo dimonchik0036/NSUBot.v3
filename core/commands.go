@@ -2,6 +2,7 @@ package core
 
 import (
 	"errors"
+	"strconv"
 	"strings"
 )
 
@@ -16,6 +17,11 @@ type Command struct {
 	ArgsStr    []string          `json:"args_str"`
 	FieldNames []string          `json:"field_names"`
 	Sep        string            `json:"sep"`
+}
+
+func (c *Command) GetArgInt64(key string) int64 {
+	id, _ := strconv.ParseInt(c.Args[key], 10, 64)
+	return id
 }
 
 func ProcessingInputByFieldNames(input string, command *Command) error {
