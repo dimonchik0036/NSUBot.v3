@@ -18,7 +18,7 @@ const (
 
 type Command struct {
 	Command    string            `json:"command"`
-	MoreArgs   bool              `json:"more_args"`
+	MoreArgs   bool              `json:"-"`
 	Args       map[string]string `json:"args"`
 	ArgsStr    []string          `json:"args_str"`
 	FieldNames []string          `json:"field_names"`
