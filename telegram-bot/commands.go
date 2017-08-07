@@ -22,6 +22,7 @@ const (
 	strCmdWeather  = "weather"
 	strCmdShowSite = "sh"
 	strCmdFeedback = "feedback"
+	strCmdStart    = "start"
 )
 
 var tgCommands core.Handlers
@@ -29,8 +30,8 @@ var tgCommands core.Handlers
 func initCommands() {
 	tgCommands = core.Handlers{}
 	tgCommands.AddHandler(core.Handler{Handler: helpCommand}, "help", "помощь")
-
-	tgCommands.AddHandler(core.Handler{Handler: mainMenuCommand}, strCmdMainMenu, "start")
+	tgCommands.AddHandler(core.Handler{Handler: startCommand}, strCmdStart)
+	tgCommands.AddHandler(core.Handler{Handler: mainMenuCommand}, strCmdMainMenu)
 
 	tgCommands.AddHandler(core.Handler{Handler: weatherCommand}, strCmdWeather)
 
@@ -40,16 +41,31 @@ func initCommands() {
 	tgCommands.AddHandler(core.Handler{Handler: feedbackCommand}, strCmdFeedback)
 }
 
+func startCommand(user *core.User, command *core.Command) {
+	tgBot.Send(tgbotapi.NewMessage(user.ID, "Приветствую!\n"+
+		"Сейчас бот находится в тестовом режиме, а значит возможны ошибки в работе (вероятность их мала).\n"+
+		"\n"+
+		"В текущей версии доступна возможность подписаться на рассылку различных новостей и посмотреть температуру.\n"+
+		"\n"+
+		"Возможно будет полезным посмотреть /help, чтобы узнать все команды.\n"+
+		"\n"+
+		"При возникновении вопросов можно оставить /feedback или обратиться напрямую к @dimonchik0036.\n"))
+
+	mainMenuCommand(user, command)
+}
+
 func helpCommand(user *core.User, command *core.Command) {
-	defaultHelp := `Список команд:
-	/menu - Вызывает главное меню.
+	defaultHelp := "Список команд:\n" +
+		"/menu - Вызывает главное меню.\n" +
+		"\n" +
+		"/cancel - Прерывает любую цепочку команд.\n" +
+		"\n" +
+		"Через меню можно подписаться на рассылку различных новостей.\n" +
+		"Если вы подписаны на какой-то раздел новостей, то как только появится новая публикация на сайте, вам придёт сообщение об этом.\n" +
+		"\n" +
+		"По всем вопросам можно обратиться к @dimonchik0036."
 
-	/cancel - Прерывает любую цепочку команд.
-
-
-	По всем вопросам можно обратиться к @dimonchik0036.`
-
-	sendMessage(user, command, defaultHelp, nil)
+	tgBot.Send(tgbotapi.NewMessage(user.ID, defaultHelp))
 }
 
 func feedbackCommand(user *core.User, command *core.Command) {
