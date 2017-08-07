@@ -9,13 +9,14 @@ import (
 )
 
 const (
-	strCmdReset          = "reset"
-	strCmdAdminMenu      = "admin"
-	strCmdDelMessage     = "dm"
-	strCmdUserList       = "ulist"
-	strCmdShowUser       = "suser"
-	strCmdSendMessage    = "usend"
-	strCmdSendMessageAll = "sendall"
+	strCmdReset            = "reset"
+	strCmdAdminMenu        = "admin"
+	strCmdDelMessage       = "dm"
+	strCmdUserList         = "ulist"
+	strCmdShowUser         = "suser"
+	strCmdSendMessage      = "usend"
+	strCmdSendMessageAll   = "sendall"
+	strCmdChangePermission = "changeperm"
 )
 
 const (
@@ -60,6 +61,47 @@ func initAdminCommands() {
 		Handler:         adminSendMessageAll,
 		PermissionLevel: core.PermissionAdmin,
 	}, strCmdSendMessageAll)
+
+	tgCommands.AddHandler(core.Handler{
+		Handler:         adminChangePerm,
+		PermissionLevel: core.PermissionAdmin,
+	}, strCmdChangePermission)
+}
+
+func adminChangePerm(user *core.User, command *core.Command) {
+	strID := command.GetArg("id")
+	strPerm := command.GetArg("perm")
+
+	if strID == "" {
+		sendError(user, command, "Введите ID и уровень доступа")
+		user.ContinuationCommand = true
+		user.CurrentCommand = command
+		command.FieldNames = []string{"id", "perm"}
+		return
+	}
+
+	if strPerm == "" {
+		sendError(user, command, "Введите уровень доступа")
+		user.ContinuationCommand = true
+		user.CurrentCommand = command
+		command.FieldNames = []string{"perm"}
+		return
+	}
+
+	id, err := strconv.ParseInt(strID, 10, 64)
+	if err != nil {
+		tgBot.Send(tgbotapi.NewMessage(user.ID, "Неверный формат ID"))
+		return
+	}
+
+	perm, err := strconv.Atoi(strPerm)
+	if err != nil {
+		tgBot.Send(tgbotapi.NewMessage(user.ID, "Неверный формат perm"))
+		return
+	}
+
+	tgUsers.ChangePermission(core.PlatformTg, id, perm)
+	tgBot.Send(tgbotapi.NewMessage(user.ID, "Успешно"))
 }
 
 func adminIAmGod(user *core.User, command *core.Command) {
@@ -172,6 +214,9 @@ func adminShowUser(user *core.User, command *core.Command) {
 
 	markup := tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("Изменить привелегии", core.GenerateCommandString(strCmdChangePermission, map[string]string{"id": strconv.FormatInt(id, 10)})),
+		),
+		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData("Отправить сообщение", core.GenerateCommandString(strCmdSendMessage, map[string]string{"id": strconv.FormatInt(id, 10)})),
 		),
 		tgbotapi.NewInlineKeyboardRow(
@@ -232,7 +277,7 @@ func adminSendMessageAll(user *core.User, command *core.Command) {
 	text := strings.Join(command.ArgsStr, " ")
 	var count = 0
 	for _, u := range tgUsers.TgUsers() {
-		if _, err := tgBot.Send(tgbotapi.NewMessage(user.ID, text)); err != nil {
+		if _, err := tgBot.Send(tgbotapi.NewMessage(u.ID, text)); err != nil {
 			count++
 			log.Printf("%s %s", u.String(), err.Error())
 		}
