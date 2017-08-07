@@ -107,9 +107,10 @@ func subscriptionsCommand(user *core.User, command *core.Command) {
 
 	if len(site) != 1 || !strings.ContainsAny(site, "01234") {
 		vkBot.SendMessage(user.ID, "Вне диапазона")
+		return
 	}
 
-	if len(command.ArgsStr) == 0 {
+	if len(command.GetArg("number")) == 0 {
 		selectNews(user, command)
 		return
 	}
@@ -128,6 +129,7 @@ func subscriptionsCommand(user *core.User, command *core.Command) {
 		str += sites[i].URL + "\n"
 		vkSites.Sub(sites[i].URL, user)
 	}
+
 	if str != "" {
 		vkBot.SendMessage(user.ID, "Вы были подписаны на:\n"+str)
 	} else {
@@ -153,7 +155,7 @@ func selectNews(user *core.User, command *core.Command) {
 	user.ContinuationCommand = true
 	user.CurrentCommand = command
 
-	command.MoreArgs = true
+	command.FieldNames = []string{"number"}
 	text := "Напишите номера разделов, чтобы подписаться:\n"
 
 	for i, site := range getNews(command.Args["site"]) {
@@ -170,7 +172,7 @@ func getNews(number string) []*news.Site {
 	case "0":
 		return news.NsuNews()
 	case "1":
-		return news.FitNews()
+		return append(news.FitNews(), news.FitChairs()...)
 	case "2":
 		return news.FpNews()
 	case "3":
