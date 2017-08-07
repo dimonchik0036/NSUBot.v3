@@ -3,7 +3,6 @@ package core
 import (
 	"fmt"
 	"strconv"
-	"strings"
 	"sync"
 	"time"
 )
@@ -108,8 +107,8 @@ func (u *Users) SetTgUser(user *User) {
 func (u *Users) PlatformUsers(platform string) (result []*User) {
 	u.Mux.RLock()
 	defer u.Mux.RUnlock()
-	for key, u := range u.Users {
-		if strings.Contains(key, platform) {
+	for _, u := range u.Users {
+		if u.Platform == platform {
 			result = append(result, u)
 		}
 	}

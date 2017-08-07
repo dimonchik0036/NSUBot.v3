@@ -88,8 +88,8 @@ func (s *Site) Update(countCheck int) (newNews []News, err error) {
 	s.Mux.Lock()
 	defer s.Mux.Unlock()
 
-	for i := range news {
-		if (s.LastNews.ID > news[i].ID) && news[i].ID != 0 || (news[i].URL == s.LastNews.URL) && (news[i].Date == s.LastNews.Date) && (news[i].Title == s.LastNews.Title) {
+	for i, n := range news {
+		if (s.LastNews.ID > n.ID) && n.ID != 0 || (n.URL == s.LastNews.URL) && (n.Date == s.LastNews.Date) && (n.Title == s.LastNews.Title) || s.LastNews.Date > n.Date {
 			break
 		}
 
