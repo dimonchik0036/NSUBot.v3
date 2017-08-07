@@ -19,7 +19,7 @@ const (
 )
 
 const (
-	userOnOnePage = 7
+	userOnOnePage = 5
 )
 
 func initAdminCommands() {
@@ -153,7 +153,7 @@ func adminUserListCommand(user *core.User, command *core.Command) {
 		tgbotapi.NewInlineKeyboardButtonData("»", addCommand(strCmdUserList, strconv.Itoa(pageNumber+1))),
 	))
 
-	sendMessage(user, command, "Выберете пользователя", &markup)
+	sendMessage(user, command, "Всего "+strconv.Itoa(len(tmpUserList))+" пользователей", &markup)
 }
 
 func adminShowUser(user *core.User, command *core.Command) {
