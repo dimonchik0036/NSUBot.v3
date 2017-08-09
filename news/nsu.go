@@ -203,7 +203,7 @@ func NsuMainPage() *Site {
 		URL:          NsuHref + "/news",
 		OptionalURL:  "/news",
 		NewsFunc:     Nsu,
-		NewsFuncName: NsuFacFuncName,
+		NewsFuncName: NsuFuncName,
 	}
 }
 
