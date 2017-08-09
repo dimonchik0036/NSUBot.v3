@@ -11,10 +11,12 @@ import (
 const (
 	strCmdReset            = "reset"
 	strCmdAdminMenu        = "admin"
+	strCmdAdminHelp        = "adminh"
 	strCmdDelMessage       = "dm"
 	strCmdUserList         = "ulist"
 	strCmdShowUser         = "suser"
 	strCmdSendMessage      = "usend"
+	strCmdDelUser          = "deluser"
 	strCmdSendMessageAll   = "sendall"
 	strCmdChangePermission = "changeperm"
 )
@@ -28,6 +30,11 @@ func initAdminCommands() {
 		Handler:         adminMenu,
 		PermissionLevel: core.PermissionAdmin,
 	}, strCmdAdminMenu)
+
+	tgCommands.AddHandler(core.Handler{
+		Handler:         adminHelpCommand,
+		PermissionLevel: core.PermissionAdmin,
+	}, strCmdAdminHelp)
 
 	tgCommands.AddHandler(core.Handler{
 		Handler:         resetCommand,
@@ -66,6 +73,11 @@ func initAdminCommands() {
 		Handler:         adminChangePerm,
 		PermissionLevel: core.PermissionAdmin,
 	}, strCmdChangePermission)
+
+	tgCommands.AddHandler(core.Handler{
+		Handler:         adminDelUser,
+		PermissionLevel: core.PermissionAdmin,
+	}, strCmdDelUser)
 }
 
 func adminChangePerm(user *core.User, command *core.Command) {
@@ -73,7 +85,7 @@ func adminChangePerm(user *core.User, command *core.Command) {
 	strPerm := command.GetArg("perm")
 
 	if strID == "" {
-		sendError(user, command, "Введите ID и уровень доступа")
+		sendError(user, command, "Введите ID и уровень доступа", false)
 		user.ContinuationCommand = true
 		user.CurrentCommand = command
 		command.FieldNames = []string{"id", "perm"}
@@ -81,7 +93,7 @@ func adminChangePerm(user *core.User, command *core.Command) {
 	}
 
 	if strPerm == "" {
-		sendError(user, command, "Введите уровень доступа")
+		sendError(user, command, "Введите уровень доступа", false)
 		user.ContinuationCommand = true
 		user.CurrentCommand = command
 		command.FieldNames = []string{"perm"}
@@ -104,6 +116,22 @@ func adminChangePerm(user *core.User, command *core.Command) {
 	tgBot.Send(tgbotapi.NewMessage(user.ID, "Успешно"))
 }
 
+func adminDelUser(user *core.User, command *core.Command) {
+	if len(command.ArgsStr) == 0 {
+		sendError(user, command, "Не указан ID", true)
+		return
+	}
+
+	id, err := strconv.ParseInt(command.ArgsStr[0], 10, 64)
+	if err != nil {
+		sendError(user, command, "Ошибка формата ID", true)
+		return
+	}
+
+	tgUsers.DelUser(core.PlatformTg, id)
+	tgBot.Send(tgbotapi.NewMessage(user.ID, "Успешно"))
+}
+
 func adminIAmGod(user *core.User, command *core.Command) {
 	if user.ID == tgAdminID {
 		user.Permission = core.PermissionAdmin
@@ -120,7 +148,10 @@ func adminMenu(user *core.User, command *core.Command) {
 			tgbotapi.NewInlineKeyboardButtonData("Список пользователей", addCommand(strCmdUserList, "f0")),
 		),
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Выключить бота", addCommand(strCmdReset, "")),
+			tgbotapi.NewInlineKeyboardButtonData("Подсказки", addBackArg(strCmdAdminHelp, strCmdAdminMenu)),
+		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("Управление новостями", addCommand(strCmdBotNewsMenu, "")),
 		),
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData("Закрыть меню", addCommand(strCmdDelMessage, "")),
@@ -128,6 +159,17 @@ func adminMenu(user *core.User, command *core.Command) {
 	)
 
 	sendMessage(user, command, "Панель админа", &markup)
+}
+
+func adminHelpCommand(user *core.User, command *core.Command) {
+	sendMessageInNewMessage(user, command, "Вы админ, поздравляю!\n"+
+		"[] обозначают необязательные флаги.\n"+
+		"<> обозначают обязательные аргументы.\n"+
+		"\n"+
+		"/"+strCmdSendMessageAll+" [--n] <text> - Отправить всем сообщения. [--n] отвечает за включение уведомлений.\n"+
+		"/"+strCmdDelUser+" <id> - Удалить пользователя.\n"+
+		"/"+strCmdReloadBotNews+" - Перезагружает новости бота.\n"+
+		"/"+strCmdAddBotNews+" <text> - Добавляет новости бота.")
 }
 
 func resetCommand(user *core.User, command *core.Command) {
@@ -195,20 +237,26 @@ func adminUserListCommand(user *core.User, command *core.Command) {
 		tgbotapi.NewInlineKeyboardButtonData("»", addCommand(strCmdUserList, strconv.Itoa(pageNumber+1))),
 	))
 
-	sendMessage(user, command, "Всего "+strconv.Itoa(len(tmpUserList))+" пользователей", &markup)
+	sendMessage(user, command, "Страница: "+strconv.Itoa(pageNumber+1)+"/"+strconv.Itoa(len(tmpUserList)/userOnOnePage+func() int {
+		if len(tmpUserList)%userOnOnePage == 0 {
+			return 0
+		} else {
+			return 1
+		}
+	}())+"\nВсего "+strconv.Itoa(len(tmpUserList))+" пользователей", &markup)
 }
 
 func adminShowUser(user *core.User, command *core.Command) {
 	log.Printf("arg %s", command.GetArg(core.StrPreviousCmd))
 	id, err := strconv.ParseInt(command.GetArg(strCmdArg), 10, 64)
 	if err != nil {
-		sendError(user, command, "Некорректный ввод ID")
+		sendError(user, command, "Некорректный ввод ID", true)
 		return
 	}
 
 	u := tgUsers.TgUser(id)
 	if u == nil {
-		sendError(user, command, "Данный ID не найден")
+		sendError(user, command, "Данный ID не найден", true)
 		return
 	}
 
@@ -234,7 +282,7 @@ func adminSendMessageUser(user *core.User, command *core.Command) {
 		user.ContinuationCommand = true
 		user.CurrentCommand = command
 		command.FieldNames = []string{"id", "text"}
-		sendError(user, command, "Введите ID и текст")
+		sendError(user, command, "Введите ID и текст", false)
 		return
 	}
 
@@ -247,7 +295,7 @@ func adminSendMessageUser(user *core.User, command *core.Command) {
 		}
 
 		if err != nil {
-			sendError(user, command, "Некорректный ID")
+			sendError(user, command, "Некорректный ID", true)
 			return
 		}
 	}
@@ -256,13 +304,13 @@ func adminSendMessageUser(user *core.User, command *core.Command) {
 		user.ContinuationCommand = true
 		user.CurrentCommand = command
 		command.FieldNames = []string{"text"}
-		sendError(user, command, "Наберите текст")
+		sendError(user, command, "Наберите текст", false)
 		return
 	}
 
 	u := tgUsers.TgUser(id)
 	if u == nil {
-		sendError(user, command, "Пользователь не найден")
+		sendError(user, command, "Пользователь не найден", true)
 		return
 	}
 
@@ -274,14 +322,26 @@ func adminSendMessageUser(user *core.User, command *core.Command) {
 }
 
 func adminSendMessageAll(user *core.User, command *core.Command) {
+	if len(command.ArgsStr) == 0 {
+		sendError(user, command, "Ошибка: сообщение пусто", true)
+		return
+	}
+
+	flag := true
+	if command.ArgsStr[0] == "--n" {
+		flag = false
+	}
+
 	text := strings.Join(command.ArgsStr, " ")
 	var count = 0
 	for _, u := range tgUsers.TgUsers() {
-		if _, err := tgBot.Send(tgbotapi.NewMessage(u.ID, text)); err != nil {
+		msg := tgbotapi.NewMessage(u.ID, text)
+		msg.DisableNotification = flag
+		if _, err := tgBot.Send(msg); err != nil {
 			count++
 			log.Printf("%s %s", u.String(), err.Error())
 		}
 	}
 
-	sendError(user, command, "Готово, ошибок при отправлении: "+strconv.Itoa(count))
+	sendError(user, command, "Готово, ошибок при отправлении: "+strconv.Itoa(count), true)
 }

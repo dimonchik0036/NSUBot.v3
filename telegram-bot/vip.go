@@ -48,7 +48,7 @@ func vipMenuCommand(user *core.User, command *core.Command) {
 func vipJokeCommand(user *core.User, command *core.Command) {
 	joke, err := jokes.GetJokes()
 	if err != nil {
-		sendError(user, command, "Произошла ошибка, повторите попытку.")
+		sendError(user, command, "Произошла ошибка, повторите попытку.", true)
 		return
 	}
 

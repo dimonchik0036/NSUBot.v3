@@ -23,15 +23,17 @@ const (
 	strCmdShowSite = "sh"
 	strCmdFeedback = "feedback"
 	strCmdStart    = "start"
+	strCmdHelp     = "help"
 )
 
 var tgCommands core.Handlers
 
 func initCommands() {
 	tgCommands = core.Handlers{}
-	tgCommands.AddHandler(core.Handler{Handler: helpCommand}, "help", "помощь")
+	tgCommands.AddHandler(core.Handler{Handler: helpCommand}, strCmdHelp, "помощь")
 	tgCommands.AddHandler(core.Handler{Handler: startCommand}, strCmdStart)
 	tgCommands.AddHandler(core.Handler{Handler: mainMenuCommand}, strCmdMainMenu)
+	tgCommands.AddHandler(core.Handler{Handler: optionMenuCommand}, strCmdOptionMenu)
 
 	tgCommands.AddHandler(core.Handler{Handler: weatherCommand}, strCmdWeather)
 
@@ -39,6 +41,10 @@ func initCommands() {
 	tgCommands.AddHandler(core.Handler{Handler: siteMenuCommand}, strCmdSiteMenu)
 	tgCommands.AddHandler(core.Handler{Handler: showSiteCommand}, strCmdShowSite)
 	tgCommands.AddHandler(core.Handler{Handler: feedbackCommand}, strCmdFeedback)
+
+	initAdminCommands()
+	initVipCommands()
+	initBotNewsCommand()
 }
 
 func startCommand(user *core.User, command *core.Command) {
@@ -73,7 +79,7 @@ func feedbackCommand(user *core.User, command *core.Command) {
 		user.ContinuationCommand = true
 		user.CurrentCommand = command
 		command.FieldNames = []string{"text"}
-		sendError(user, command, "Наберите свой отзыв")
+		sendError(user, command, "Наберите свой отзыв", true)
 		return
 	}
 
@@ -89,19 +95,19 @@ func weatherCommand(user *core.User, command *core.Command) {
 func showSiteCommand(user *core.User, command *core.Command) {
 	args := command.GetArg(strCmdArg)
 	if len(args) < 2 {
-		sendError(user, command, "Мало аргументов")
+		sendError(user, command, "Мало аргументов", true)
 		return
 	}
 
 	siteNumber, err := strconv.Atoi(args[:1])
 	if err != nil || siteNumber < 0 || siteNumber > 5 {
-		sendError(user, command, "Диапазон 0-5")
+		sendError(user, command, "Диапазон 0-5", true)
 		return
 	}
 
 	pageNumber, err := strconv.Atoi(args[1:2])
 	if err != nil {
-		sendError(user, command, "Номер страницы неверный")
+		sendError(user, command, "Номер страницы неверный", true)
 		return
 	}
 
@@ -113,7 +119,6 @@ func showSiteCommand(user *core.User, command *core.Command) {
 	if pageNumber*5 > len(siteList) {
 		pageNumber = len(siteList) / 5
 	}
-	siteList = siteList[pageNumber*5:]
 
 	if len(args) > 2 {
 		subID, err := strconv.Atoi(args[2:3])
@@ -124,7 +129,7 @@ func showSiteCommand(user *core.User, command *core.Command) {
 
 	var markup tgbotapi.InlineKeyboardMarkup
 
-	for i, site := range siteList {
+	for i, site := range siteList[pageNumber*5:] {
 		if i == 5 {
 			break
 		}
@@ -143,7 +148,13 @@ func showSiteCommand(user *core.User, command *core.Command) {
 		tgbotapi.NewInlineKeyboardButtonData("»", addCommand(strCmdShowSite, args[:1]+strconv.Itoa(pageNumber+1))),
 	))
 
-	sendMessage(user, command, "Выберете подписки", &markup)
+	sendMessage(user, command, "Страница: "+strconv.Itoa(pageNumber+1)+"/"+strconv.Itoa(len(siteList)/5+func() int {
+		if len(siteList)%5 == 0 {
+			return 0
+		} else {
+			return 1
+		}
+	}())+"\nВыберете подписки", &markup)
 }
 
 func checkSite(url string, user *core.User) string {

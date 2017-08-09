@@ -90,12 +90,16 @@ func sendMessageInNewMessage(user *core.User, command *core.Command, text string
 	}
 }
 
-func sendError(user *core.User, command *core.Command, text string) {
+func sendError(user *core.User, command *core.Command, text string, alert bool) {
 	callbackID := command.GetArg(strCallbackID)
 	if callbackID == "" {
 		tgBot.Send(tgbotapi.NewMessage(user.ID, text))
 	} else {
-		tgBot.AnswerCallbackQuery(tgbotapi.NewCallbackWithAlert(callbackID, text))
+		tgBot.AnswerCallbackQuery(tgbotapi.CallbackConfig{
+			CallbackQueryID: callbackID,
+			Text:            text,
+			ShowAlert:       alert,
+		})
 	}
 }
 

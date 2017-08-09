@@ -6,9 +6,10 @@ import (
 )
 
 const (
-	strCmdMainMenu = "menu"
-	strCmdSiteMenu = "m_si"
-	strCmdSubMenu  = "m_su"
+	strCmdMainMenu   = "menu"
+	strCmdSiteMenu   = "m_si"
+	strCmdSubMenu    = "m_su"
+	strCmdOptionMenu = "m_opt"
 )
 const (
 	backButtonText = "« Назад"
@@ -24,11 +25,27 @@ func mainMenuCommand(user *core.User, command *core.Command) {
 			tgbotapi.NewInlineKeyboardButtonData("Управление подписками", addCommand(strCmdSubMenu, "")),
 		),
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Оставить отзыв", addCommand(strCmdFeedback, "")),
+			tgbotapi.NewInlineKeyboardButtonData("Дополнительно", addCommand(strCmdOptionMenu, "")),
 		),
 	)
 
 	sendMessage(user, command, "Главное меню", &markup)
+}
+
+func optionMenuCommand(user *core.User, command *core.Command) {
+	markup := tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("История обновлений", addCommand(strCmdBotNewsList, "")),
+		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("Оставить отзыв", addCommand(strCmdFeedback, "")),
+		),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData(backButtonText, addCommand(strCmdMainMenu, "")),
+		),
+	)
+
+	sendMessage(user, command, "Дополнительно", &markup)
 }
 
 func subMenuCommand(user *core.User, command *core.Command) {
@@ -36,7 +53,10 @@ func subMenuCommand(user *core.User, command *core.Command) {
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData("Сайты", addCommand(strCmdSiteMenu, "")),
 		),
-		tgbotapi.NewInlineKeyboardRow(tgbotapi.NewInlineKeyboardButtonData(backButtonText, addCommand(strCmdMainMenu, ""))))
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData(backButtonText, addCommand(strCmdMainMenu, "")),
+		),
+	)
 
 	sendMessage(user, command, "Управление подписками", &markup)
 }
@@ -54,7 +74,6 @@ func addBackArg(target string, previous string) string {
 }
 
 func siteMenuCommand(user *core.User, command *core.Command) {
-
 	markup := tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData("Сайт НГУ", addCommand(strCmdShowSite, "10")),
