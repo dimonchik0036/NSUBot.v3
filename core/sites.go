@@ -7,7 +7,7 @@ import (
 )
 
 type Sites struct {
-	Mux   sync.RWMutex
+	Mux   sync.RWMutex     `json:"-"`
 	Sites map[string]*Site `json:"sites"`
 }
 
