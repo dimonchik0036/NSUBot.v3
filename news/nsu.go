@@ -15,6 +15,7 @@ const (
 
 func NsuNews() []*Site {
 	return []*Site{
+		NsuMainPage(),
 		NsuReportage(),
 		NsuInterview(),
 		NsuAnnounce(),
@@ -193,6 +194,16 @@ func NsuReportage() *Site {
 		OptionalURL:  "/news?mnc.news.type=reportage",
 		NewsFunc:     Nsu,
 		NewsFuncName: NsuFuncName,
+	}
+}
+
+func NsuMainPage() *Site {
+	return &Site{
+		Title:        "Все новости",
+		URL:          NsuHref + "/news",
+		OptionalURL:  "/news",
+		NewsFunc:     Nsu,
+		NewsFuncName: NsuFacFuncName,
 	}
 }
 
