@@ -45,11 +45,11 @@ func commandSelect(user *core.User, input string) *core.Command {
 	return user.CurrentCommand
 }
 
-func NewsHandler(users *core.Users, news []news.News) {
+func NewsHandler(users *core.Users, news []news.News, title string) {
 	vkUsers := users.VkUsers()
 	for _, user := range vkUsers {
 		for _, n := range news {
-			vkBot.SendMessage(user.ID, n.URL+"\n"+n.Title+"\n"+n.Decryption)
+			vkBot.SendMessage(user.ID, title+"\n"+n.URL+"\n"+n.Title+"\n"+n.Decryption)
 		}
 	}
 }
