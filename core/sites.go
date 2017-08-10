@@ -4,11 +4,29 @@ import (
 	"github.com/dimonchik0036/nsu-bot/news"
 	"log"
 	"sync"
+	"time"
 )
 
 type Sites struct {
 	Mux   sync.RWMutex     `json:"-"`
 	Sites map[string]*Site `json:"sites"`
+}
+
+func (s *Sites) AddSite(site *Site) {
+	s.Mux.Lock()
+	defer s.Mux.Unlock()
+	if site == nil || site.Site == nil {
+		log.Println("WTF?! Site is a nil pointer")
+		return
+	}
+
+	s.Sites[site.Site.URL] = site
+}
+
+func (s *Sites) DelSite(href string) {
+	s.Mux.Lock()
+	defer s.Mux.Unlock()
+	delete(s.Sites, href)
 }
 
 func (s *Sites) ChangeSub(href string, user *User) {
@@ -67,7 +85,7 @@ func (s *Sites) CheckUser(href string, user *User) bool {
 	return false
 }
 
-func (s *Sites) Update(handler func(*Users, []news.News)) {
+func (s *Sites) Update(handler func(*Users, []news.News, string)) {
 	for _, site := range s.Sites {
 		news, err := site.Site.Update(5)
 		if err != nil {
@@ -79,7 +97,8 @@ func (s *Sites) Update(handler func(*Users, []news.News)) {
 			continue
 		}
 
-		go handler(&site.Users, news)
+		go handler(&site.Users, news, site.Site.Title)
+		time.Sleep(250 * time.Millisecond)
 	}
 }
 
