@@ -14,6 +14,10 @@ const (
 )
 
 const (
+	siteOnOnePage = 5
+)
+
+const (
 	strCallbackID = "cID"
 	strMessageID  = "mID"
 )
@@ -45,6 +49,7 @@ func initCommands() {
 	initAdminCommands()
 	initVipCommands()
 	initBotNewsCommand()
+	initVkSiteCommand()
 }
 
 func startCommand(user *core.User, command *core.Command) {
@@ -93,63 +98,74 @@ func weatherCommand(user *core.User, command *core.Command) {
 }
 
 func showSiteCommand(user *core.User, command *core.Command) {
-	args := command.GetArg(strCmdArg)
+	args := strings.Split(command.GetArg(strCmdArg), "_")
 	if len(args) < 2 {
-		sendError(user, command, "Мало аргументов", true)
+		sendError(user, command, "Мало аргументов. Попробуйте вернуться назад и повторить попытку.", true)
 		return
 	}
 
-	siteNumber, err := strconv.Atoi(args[:1])
-	if err != nil || siteNumber < 0 || siteNumber > 5 {
-		sendError(user, command, "Диапазон 0-5", true)
+	siteNumber, err := strconv.Atoi(args[0])
+	if err != nil || siteNumber < 0 || siteNumber > siteOnOnePage {
+		sendError(user, command, "Диапазон 0-"+strconv.Itoa(siteOnOnePage), true)
 		return
 	}
 
-	pageNumber, err := strconv.Atoi(args[1:2])
+	pageNumber, err := strconv.Atoi(args[1])
 	if err != nil {
 		sendError(user, command, "Номер страницы неверный", true)
 		return
 	}
 
-	siteList := news.GetSite(siteNumber)
+	var siteList []*news.Site
+	if siteNumber == 5 {
+		vkGroupSites.Mux.RLock()
+		defer vkGroupSites.Mux.RUnlock()
+		siteList = vkGroupSites.Groups
+	} else {
+		siteList = news.GetSite(siteNumber)
+	}
 	if pageNumber < 0 {
 		pageNumber = 0
 	}
-
-	if pageNumber*5 > len(siteList) {
-		pageNumber = len(siteList) / 5
+	println(len(siteList))
+	if pageNumber*siteOnOnePage > len(siteList) {
+		pageNumber = len(siteList) / siteOnOnePage
 	}
 
 	if len(args) > 2 {
-		subID, err := strconv.Atoi(args[2:3])
-		if err == nil && subID < len(siteList) {
-			tgSites.ChangeSub(siteList[subID].URL, user)
+		subID, err := strconv.Atoi(args[2])
+		if err == nil && (subID+pageNumber*siteOnOnePage < len(siteList)) {
+			tgSites.ChangeSub(siteList[pageNumber*siteOnOnePage+subID].URL, user)
 		}
+	}
+
+	backCmd := command.GetArg(core.StrPreviousCmd)
+	if strings.HasPrefix(backCmd, "c=") {
+		backCmd = backCmd[2:]
+	} else {
+		//backCmd = strCmdSubMenu
 	}
 
 	var markup tgbotapi.InlineKeyboardMarkup
 
-	for i, site := range siteList[pageNumber*5:] {
-		if i == 5 {
+	for i, site := range siteList[pageNumber*siteOnOnePage:] {
+		if i == siteOnOnePage {
 			break
 		}
 
-		markup.InlineKeyboard = append(markup.InlineKeyboard, tgbotapi.NewInlineKeyboardRow(tgbotapi.NewInlineKeyboardButtonData(checkSite(site.URL, user)+site.Title, addCommand(strCmdShowSite, args[:2]+strconv.Itoa(i)))))
+		markup.InlineKeyboard = append(markup.InlineKeyboard, tgbotapi.NewInlineKeyboardRow(tgbotapi.NewInlineKeyboardButtonData(checkSite(site.URL, user)+site.Title, addBackArg(strCmdShowSite+"*"+args[0]+"_"+args[1]+"_"+strconv.Itoa(i), backCmd))))
 	}
 
 	markup.InlineKeyboard = append(markup.InlineKeyboard, tgbotapi.NewInlineKeyboardRow(
-		tgbotapi.NewInlineKeyboardButtonData("«", addCommand(strCmdShowSite, args[:1]+strconv.Itoa(func() int {
-			if pageNumber-1 < 0 {
-				return 0
-			}
-			return pageNumber - 1
-		}()))),
-		tgbotapi.NewInlineKeyboardButtonData("Назад", addCommand(strCmdSiteMenu, "")),
-		tgbotapi.NewInlineKeyboardButtonData("»", addCommand(strCmdShowSite, args[:1]+strconv.Itoa(pageNumber+1))),
+		tgbotapi.NewInlineKeyboardButtonData("«", addBackArg(strCmdShowSite+"*"+args[0]+"_"+strconv.Itoa(pageNumber-1), backCmd)),
+		tgbotapi.NewInlineKeyboardButtonData("Назад", addCommand(backCmd, "")),
+		tgbotapi.NewInlineKeyboardButtonData("»", addBackArg(strCmdShowSite+"*"+args[0]+"_"+strconv.Itoa(pageNumber+1), backCmd)),
 	))
 
-	sendMessage(user, command, "Страница: "+strconv.Itoa(pageNumber+1)+"/"+strconv.Itoa(len(siteList)/5+func() int {
-		if len(siteList)%5 == 0 {
+	sendMessage(user, command, "Страница: "+strconv.Itoa(pageNumber+1)+"/"+strconv.Itoa(len(siteList)/siteOnOnePage+func() int {
+		if len(siteList) == 0 {
+			return 1
+		} else if len(siteList)%siteOnOnePage == 0 {
 			return 0
 		} else {
 			return 1

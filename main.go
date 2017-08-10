@@ -6,6 +6,8 @@ import (
 	"github.com/dimonchik0036/nsu-bot/nsuweather"
 	"github.com/dimonchik0036/nsu-bot/telegram-bot"
 	"github.com/dimonchik0036/nsu-bot/vk-bot"
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
 	"log"
 	"os"
 	"time"
@@ -18,7 +20,7 @@ const (
 
 func main() {
 	var processing func(*core.Config)
-	var newsHandler func(*core.Users, []news.News)
+	var newsHandler func(*core.Users, []news.News, string)
 	if len(os.Args) > 1 {
 		switch os.Args[1] {
 		case "--help":
@@ -35,9 +37,9 @@ func main() {
 			return
 		}
 	} else {
-		newsHandler = func(users *core.Users, news []news.News) {
-			go vkbot.NewsHandler(users, news)
-			go tgbot.NewsHandler(users, news)
+		newsHandler = func(users *core.Users, news []news.News, title string) {
+			go vkbot.NewsHandler(users, news, title)
+			go tgbot.NewsHandler(users, news, title)
 		}
 
 		processing = func(config *core.Config) {
@@ -51,6 +53,7 @@ func main() {
 	}
 	//initLog() //comment while testing
 	config := core.LoadConfig()
+	loadVkServiceKey()
 	go UpdateSection(config, newsHandler)
 
 	processing(config)
@@ -65,12 +68,12 @@ func initLog() {
 	log.SetOutput(file)
 }
 
-func UpdateSection(config *core.Config, newsHandler func(*core.Users, []news.News)) {
+func UpdateSection(config *core.Config, newsHandler func(*core.Users, []news.News, string)) {
 	go weatherUpdate(config.Weather, 2*time.Minute)
 
 	go save(config, 20*time.Second, 5*time.Minute)
 
-	go sitesUpdate(config.Sites, 3*time.Minute, newsHandler)
+	go sitesUpdate(config.Sites, 45*time.Second, newsHandler)
 }
 
 func weatherUpdate(weather *nsuweather.Weather, duration time.Duration) {
@@ -88,9 +91,29 @@ func save(config *core.Config, delay time.Duration, duration time.Duration) {
 	}
 }
 
-func sitesUpdate(sites *core.Sites, duration time.Duration, handler func(*core.Users, []news.News)) {
+func sitesUpdate(sites *core.Sites, duration time.Duration, handler func(*core.Users, []news.News, string)) {
 	for {
 		sites.Update(handler)
 		time.Sleep(duration)
 	}
+}
+
+func loadVkServiceKey() {
+	data, err := ioutil.ReadFile(".bot_config")
+	if err != nil {
+		log.Panicf("Bot config not found: %s", err.Error())
+		return
+	}
+
+	tmp := struct {
+		VkKey string
+	}{}
+
+	if err := yaml.Unmarshal(data, &tmp); err != nil {
+		log.Panicf("Bot config: yaml throw error: %s", err.Error())
+		return
+	}
+
+	news.SetVkServiceKey(tmp.VkKey)
+	return
 }

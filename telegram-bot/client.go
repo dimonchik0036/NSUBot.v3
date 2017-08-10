@@ -10,6 +10,7 @@ func Processing(config *core.Config) {
 	loadTgConfig()
 	initConfig(config)
 	initBotNews()
+	initVkSites()
 	initCommands()
 	log.Printf("Телеграм-бот запущен")
 	u := tgbotapi.NewUpdate(0)

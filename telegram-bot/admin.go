@@ -154,6 +154,9 @@ func adminMenu(user *core.User, command *core.Command) {
 			tgbotapi.NewInlineKeyboardButtonData("Управление новостями", addCommand(strCmdBotNewsMenu, "")),
 		),
 		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("Управление VK группами", addCommand(strCmdVkSiteMenu, "")),
+		),
+		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData("Закрыть меню", addCommand(strCmdDelMessage, "")),
 		),
 	)
@@ -169,11 +172,14 @@ func adminHelpCommand(user *core.User, command *core.Command) {
 		"/"+strCmdSendMessageAll+" [--n] <text> - Отправить всем сообщения. [--n] отвечает за включение уведомлений.\n"+
 		"/"+strCmdDelUser+" <id> - Удалить пользователя.\n"+
 		"/"+strCmdReloadBotNews+" - Перезагружает новости бота.\n"+
-		"/"+strCmdAddBotNews+" <text> - Добавляет новости бота.")
+		"/"+strCmdAddBotNews+" <text> - Добавляет новости бота.\n" +
+		"/"+strCmdAddVKSite+" <domain> <title> - Добавляет VK группу.\n" +
+		"/"+strCmdDelVKSite+" <domain> - Удаляет VK группу.")
 }
 
 func resetCommand(user *core.User, command *core.Command) {
 	if command.GetArg("answer") == "yes" || command.GetArg(strCmdArg) == "yes" {
+		tgBot.Send(tgbotapi.NewMessage(user.ID, "Выключаюсь"))
 		globalConfig.Reset()
 	} else {
 		command.FieldNames = []string{"answer"}

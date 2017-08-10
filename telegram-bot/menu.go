@@ -54,6 +54,9 @@ func subMenuCommand(user *core.User, command *core.Command) {
 			tgbotapi.NewInlineKeyboardButtonData("Сайты", addCommand(strCmdSiteMenu, "")),
 		),
 		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("VK группы", addBackArg(strCmdShowSite+"*5_0", strCmdSubMenu)),
+		),
+		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData(backButtonText, addCommand(strCmdMainMenu, "")),
 		),
 	)
@@ -76,19 +79,19 @@ func addBackArg(target string, previous string) string {
 func siteMenuCommand(user *core.User, command *core.Command) {
 	markup := tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Сайт НГУ", addCommand(strCmdShowSite, "10")),
+			tgbotapi.NewInlineKeyboardButtonData("Сайт НГУ", addBackArg(strCmdShowSite+"*1_0", strCmdSiteMenu)),
 		),
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Сайт ФИТ", addCommand(strCmdShowSite, "00")),
+			tgbotapi.NewInlineKeyboardButtonData("Сайт ФИТ", addBackArg(strCmdShowSite+"*0_0", strCmdSiteMenu)),
 		),
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Сайт ММФ", addCommand(strCmdShowSite, "20")),
+			tgbotapi.NewInlineKeyboardButtonData("Сайт ММФ", addBackArg(strCmdShowSite+"*2_0", strCmdSiteMenu)),
 		),
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Сайт ФП", addCommand(strCmdShowSite, "30")),
+			tgbotapi.NewInlineKeyboardButtonData("Сайт ФП", addBackArg(strCmdShowSite+"*3_0", strCmdSiteMenu)),
 		),
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Сайт ФилФ", addCommand(strCmdShowSite, "40")),
+			tgbotapi.NewInlineKeyboardButtonData("Сайт ФилФ", addBackArg(strCmdShowSite+"*4_0", strCmdSiteMenu)),
 		),
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData(backButtonText, addCommand(strCmdSubMenu, "")),

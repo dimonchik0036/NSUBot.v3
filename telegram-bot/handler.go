@@ -10,15 +10,23 @@ import (
 	"time"
 )
 
-func NewsHandler(users *core.Users, news []news.News) {
+func NewsHandler(users *core.Users, news []news.News, title string) {
 	tgUsers := users.TgUsers()
 	for _, user := range tgUsers {
 		for _, n := range news {
-			msg := tgbotapi.NewMessage(user.ID, n.URL+"\n\n"+n.Title+"\n\n"+n.Decryption+"\n"+time.Unix(n.Date, 0).Format("02.01.2006"))
+			msg := tgbotapi.NewMessage(user.ID, title+"\n"+n.URL+"\n\n"+stringCheck(n.Title)+stringCheck(n.Decryption)+time.Unix(n.Date, 0).Format("02.01.2006"))
 			if _, err := tgBot.Send(msg); err != nil {
 				log.Printf("%s %s", user.String(), err.Error())
 			}
 		}
+	}
+}
+
+func stringCheck(s string) string {
+	if s == "" {
+		return ""
+	} else {
+		return s+"\n"
 	}
 }
 
