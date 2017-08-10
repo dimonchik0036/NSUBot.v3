@@ -69,6 +69,7 @@ func GetSite(number int) []*Site {
 }
 
 type Site struct {
+	ID            int64                                        `json:"id"`
 	Mux           sync.Mutex                                   `json:"-"`
 	Title         string                                       `json:"title"`
 	OptionalTitle string                                       `json:"optional_title"`
@@ -89,8 +90,12 @@ func (s *Site) Update(countCheck int) (newNews []News, err error) {
 	defer s.Mux.Unlock()
 
 	for i, n := range news {
-		if (s.LastNews.ID > n.ID) && n.ID != 0 || (n.URL == s.LastNews.URL) && (n.Date == s.LastNews.Date) && (n.Title == s.LastNews.Title) || s.LastNews.Date > n.Date {
+		if (s.LastNews.ID > n.ID) && n.ID != 0 || (n.URL == s.LastNews.URL) && (n.Title == s.LastNews.Title) || s.LastNews.Date > n.Date {
 			break
+		}
+
+		if len(n.Decryption) > 3000 {
+			n.Decryption = n.Decryption[:3000] + "...\nДля продолжения перейдите по ссылке в начале сообщения."
 		}
 
 		newNews = append(newNews, news[i])
@@ -115,6 +120,8 @@ func (s *Site) InitFunc() {
 		s.NewsFunc = Mmf
 	case FpFuncName:
 		s.NewsFunc = Fp
+	case VkFuncName:
+		s.NewsFunc = Vk
 	default:
 		panic("WTF?!")
 	}
