@@ -32,7 +32,7 @@ func initVipCommands() {
 func vipMenuCommand(user *core.User, command *core.Command) {
 	markup := tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Шутка", addBackArg(strCmdJoke, strCmdVIPMenu)),
+			tgbotapi.NewInlineKeyboardButtonData("Шутка", addCommand(strCmdJoke, "")),
 		),
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData("Подсказки", addBackArg(strCmdVIPHelp, strCmdVIPMenu)),
@@ -52,7 +52,14 @@ func vipJokeCommand(user *core.User, command *core.Command) {
 		return
 	}
 
-	sendMessageInNewMessage(user, command, joke)
+	markup := tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData(backButtonText, addCommand(strCmdVIPMenu, "")),
+			tgbotapi.NewInlineKeyboardButtonData("Обновить", addCommand(strCmdJoke, "")),
+		),
+	)
+
+	sendMessage(user, command, joke, &markup)
 }
 
 func vipHelpCommand(user *core.User, command *core.Command) {

@@ -26,7 +26,7 @@ func stringCheck(s string) string {
 	if s == "" {
 		return ""
 	} else {
-		return s+"\n"
+		return s + "\n"
 	}
 }
 

@@ -172,8 +172,8 @@ func adminHelpCommand(user *core.User, command *core.Command) {
 		"/"+strCmdSendMessageAll+" [--n] <text> - Отправить всем сообщения. [--n] отвечает за включение уведомлений.\n"+
 		"/"+strCmdDelUser+" <id> - Удалить пользователя.\n"+
 		"/"+strCmdReloadBotNews+" - Перезагружает новости бота.\n"+
-		"/"+strCmdAddBotNews+" <text> - Добавляет новости бота.\n" +
-		"/"+strCmdAddVKSite+" <domain> <title> - Добавляет VK группу.\n" +
+		"/"+strCmdAddBotNews+" <text> - Добавляет новости бота.\n"+
+		"/"+strCmdAddVKSite+" <domain> <title> - Добавляет VK группу.\n"+
 		"/"+strCmdDelVKSite+" <domain> - Удаляет VK группу.")
 }
 
@@ -253,7 +253,6 @@ func adminUserListCommand(user *core.User, command *core.Command) {
 }
 
 func adminShowUser(user *core.User, command *core.Command) {
-	log.Printf("arg %s", command.GetArg(core.StrPreviousCmd))
 	id, err := strconv.ParseInt(command.GetArg(strCmdArg), 10, 64)
 	if err != nil {
 		sendError(user, command, "Некорректный ввод ID", true)
