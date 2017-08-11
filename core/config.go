@@ -64,13 +64,14 @@ func saveAndMarshal(filename string, v interface{}) error {
 	if err != nil {
 		return err
 	}
+	defer file.Close()
 
 	_, err = file.Write(data)
 	if err != nil {
 		return err
 	}
 
-	return file.Close()
+	return nil
 }
 
 func saveUsers(users *Users) {
