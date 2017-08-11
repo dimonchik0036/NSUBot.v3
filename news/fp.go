@@ -1,6 +1,7 @@
 package news
 
 import (
+	"html"
 	"regexp"
 )
 
@@ -44,7 +45,7 @@ func Fp(href string, count int) (news []News, err error) {
 	for i := range dates {
 		news = append(news, News{
 			ID:    idScan(string((hrefs[i*2+1][0])[16:])),
-			Title: string(rg.ReplaceAll(hrefs[i*2+1][1], []byte(""))),
+			Title: html.UnescapeString(string(rg.ReplaceAll(hrefs[i*2+1][1], []byte("")))),
 			URL:   FpHref + string(hrefs[i*2+1][0]),
 			Date:  dates[i],
 		})

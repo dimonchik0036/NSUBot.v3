@@ -90,7 +90,7 @@ func (s *Site) Update(countCheck int) (newNews []News, err error) {
 	defer s.Mux.Unlock()
 
 	for i, n := range news {
-		if (s.LastNews.ID > n.ID) && n.ID != 0 || (n.URL == s.LastNews.URL) && (n.Title == s.LastNews.Title) || s.LastNews.Date > n.Date {
+		if (s.LastNews.ID > n.ID) && n.ID != 0 || (n.URL == s.LastNews.URL) || s.LastNews.Date > n.Date {
 			break
 		}
 
@@ -132,12 +132,11 @@ func getNewsPage(url string) ([]byte, error) {
 	if err != nil {
 		return []byte{}, err
 	}
+	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
 		return []byte{}, errors.New("Error status: " + res.Status)
 	}
-
-	defer res.Body.Close()
 
 	utf8, err := charset.NewReader(res.Body, res.Header.Get("Content-Type"))
 	if err != nil {

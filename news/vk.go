@@ -11,7 +11,7 @@ const (
 	VkFuncName   = "vkname"
 )
 
-var vkServiceKey = ""
+var vkClient *vkapi.Client
 
 type ByID []News
 
@@ -20,9 +20,7 @@ func (a ByID) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ByID) Less(i, j int) bool { return a[i].ID > a[j].ID }
 
 func Vk(domain string, count int) (news []News, err error) {
-	client, _ := vkapi.NewClientFromToken(vkServiceKey)
-	client.SetLanguage(vkapi.LangRU)
-	_, wall, _, _, e := client.GetWall(vkapi.NewDstFromDomain(domain), int64(count), 0, "all", false)
+	_, wall, _, _, e := vkClient.GetWall(vkapi.NewDstFromDomain(domain), int64(count), 0, "all", false)
 	if e != nil {
 		return []News{}, e.ToError()
 	}
@@ -42,7 +40,8 @@ func Vk(domain string, count int) (news []News, err error) {
 }
 
 func SetVkServiceKey(key string) {
-	vkServiceKey = key
+	vkClient, _ = vkapi.NewClientFromToken(key)
+	vkClient.SetLanguage(vkapi.LangRU)
 }
 
 func NewVkSite(id int64, domain string, title string) *Site {

@@ -244,12 +244,12 @@ func Nsu(href string, count int) (news []News, err error) {
 		news = append(news, News{
 			Title: html.UnescapeString(string(href[0][1])),
 			URL:   NsuHref + string(href[0][0]),
-			Decryption: func() string {
+			Decryption: html.UnescapeString(func() string {
 				if s := decryptionRg.Find(b); len(s) > 7 {
 					return string(s[3 : len(s)-4])
 				}
 				return ""
-			}(),
+			}()),
 			Date: nsuDate(NsuHref + string(href[0][0])).Unix(),
 		})
 
@@ -291,12 +291,12 @@ func NsuFac(href string, count int) (news []News, err error) {
 		news = append(news, News{
 			Title: html.UnescapeString(string(href[0][1])),
 			URL:   NsuHref + string(href[0][0]),
-			Decryption: func() string {
+			Decryption: html.UnescapeString(func() string {
 				if s := decryptionRg.Find(b); len(s) > 7 {
 					return string(s[3 : len(s)-4])
 				}
 				return ""
-			}(),
+			}()),
 			Date: nsuDate(NsuHref + string(href[0][0])).Unix(),
 		})
 

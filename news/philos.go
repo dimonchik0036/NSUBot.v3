@@ -1,6 +1,7 @@
 package news
 
 import (
+	"html"
 	"regexp"
 	"strings"
 	"time"
@@ -70,7 +71,7 @@ func Philos(href string, count int) (news []News, err error) {
 				}
 				return 0
 			}(),
-			Title: string(b[11:]),
+			Title: html.UnescapeString(string(b[11:])),
 			URL:   PhilosHref + string(href[0][0]),
 			Date:  t.Unix(),
 		})
