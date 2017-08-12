@@ -126,7 +126,7 @@ func showSiteCommand(user *core.User, command *core.Command) {
 	if pageNumber < 0 {
 		pageNumber = 0
 	}
-	println(len(siteList))
+
 	if pageNumber*siteOnOnePage > len(siteList) {
 		pageNumber = len(siteList) / siteOnOnePage
 	}
@@ -142,7 +142,7 @@ func showSiteCommand(user *core.User, command *core.Command) {
 	if strings.HasPrefix(backCmd, "c=") {
 		backCmd = backCmd[2:]
 	} else {
-		//backCmd = strCmdSubMenu
+		backCmd = strCmdSubMenu
 	}
 
 	var markup tgbotapi.InlineKeyboardMarkup
