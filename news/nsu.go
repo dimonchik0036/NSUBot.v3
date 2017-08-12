@@ -229,7 +229,7 @@ func Nsu(href string, count int) (news []News, err error) {
 	}
 
 	body = rg.Find(body)
-	rg, err = regexp.Compile("<h3>.*?</p>")
+	rg, err = regexp.Compile("<h.>.*?</p>")
 	if err != nil {
 		return []News{}, err
 	}
