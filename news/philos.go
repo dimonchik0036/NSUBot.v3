@@ -61,7 +61,7 @@ func Philos(href string, count int) (news []News, err error) {
 
 	for _, b := range rg.FindAll(body, count) {
 		href := hrefProcessing(b, 1)
-		t, _ := time.Parse("<li>"+PhilosTimeLayout, string(b[:14]))
+		t, _ := time.ParseInLocation("<li>"+PhilosTimeLayout, string(b[:14]), time.Local)
 		b = replaceRg.ReplaceAll(b, []byte(""))
 		news = append(news, News{
 			ID: func() int64 {

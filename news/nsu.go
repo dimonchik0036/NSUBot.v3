@@ -15,6 +15,7 @@ const (
 
 func NsuNews() []*Site {
 	return []*Site{
+		NsuMainNews(),
 		NsuMainPage(),
 		NsuReportage(),
 		NsuInterview(),
@@ -207,6 +208,16 @@ func NsuMainPage() *Site {
 	}
 }
 
+func NsuMainNews() *Site {
+	return &Site{
+		Title:        "Главные новости",
+		URL:          NsuHref + "/?lang=ru",
+		OptionalURL:  "/?lang=ru",
+		NewsFunc:     NsuFac,
+		NewsFuncName: NsuFacFuncName,
+	}
+}
+
 func NsuInterview() *Site {
 	return &Site{
 		Title:        "Интервью",
@@ -317,7 +328,11 @@ func nsuDate(url string) time.Time {
 	if err != nil {
 		return time.Time{}
 	}
-	str := string(timeRg.Find(body))
-	t, _ := time.Parse("Последняя редакция: "+NsuTimeLayout, str[128:len(str)-16])
+	str := timeRg.Find(body)
+	if len(str) < 165 {
+		return time.Time{}
+	}
+
+	t, _ := time.ParseInLocation(NsuTimeLayout, string(str[165:len(str)-16]), time.Local)
 	return t
 }

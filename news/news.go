@@ -211,7 +211,7 @@ func dateProcessing(body []byte, count int, begin string, end string, layout str
 	}
 
 	for _, date := range rg.FindAll(body, count) {
-		t, err := time.Parse(begin+layout+end, string(date))
+		t, err := time.ParseInLocation(begin+layout+end, string(date), time.Local)
 		if err != nil {
 			dates = append(dates, 0)
 		}
