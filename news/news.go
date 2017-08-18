@@ -101,7 +101,9 @@ func (s *Site) Update(countCheck int) (newNews []News, err error) {
 		newNews = append(newNews, news[i])
 	}
 
-	s.LastNews = news[0]
+	if news[0].Date >= s.LastNews.Date {
+		s.LastNews = news[0]
+	}
 
 	return reversNews(newNews), nil
 }
