@@ -92,8 +92,15 @@ func feedbackCommand(user *core.User, command *core.Command) {
 }
 
 func weatherCommand(user *core.User, command *core.Command) {
-	sendMessageInNewMessage(user, command, tgWeather.ShowWeather()+"\n"+
-		"Время последнего обновления: "+tgWeather.ShowTime())
+	markup := tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData(backButtonText, addCommand(strCmdMainMenu, "")),
+			tgbotapi.NewInlineKeyboardButtonData("Обновить", addCommand(strCmdWeather, "")),
+		),
+	)
+
+	sendMessage(user, command, tgWeather.ShowWeather()+"\n"+
+		"Время последнего обновления: "+tgWeather.ShowTime(), &markup)
 }
 
 func showSiteCommand(user *core.User, command *core.Command) {

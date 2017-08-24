@@ -19,7 +19,7 @@ const (
 func mainMenuCommand(user *core.User, command *core.Command) {
 	markup := tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Температура", addBackArg(strCmdWeather, strCmdMainMenu)),
+			tgbotapi.NewInlineKeyboardButtonData("Температура", addCommand(strCmdWeather, "")),
 		),
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData("Управление подписками", addCommand(strCmdSubMenu, "")),
