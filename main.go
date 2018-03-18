@@ -3,9 +3,9 @@ package main
 import (
 	"github.com/dimonchik0036/nsu-bot/core"
 	"github.com/dimonchik0036/nsu-bot/news"
+	"github.com/dimonchik0036/nsu-bot/nsuschedule"
 	"github.com/dimonchik0036/nsu-bot/nsuweather"
 	"github.com/dimonchik0036/nsu-bot/telegram-bot"
-	"github.com/dimonchik0036/nsu-bot/vk-bot"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
@@ -19,7 +19,7 @@ const (
 )
 
 func main() {
-	var processing func(*core.Config)
+	/*var processing func(*core.Config)
 	var newsHandler func(*core.Users, []news.News, string)
 	if len(os.Args) > 1 {
 		switch os.Args[1] {
@@ -50,13 +50,13 @@ func main() {
 				time.Sleep(24 * time.Hour)
 			}
 		}
-	}
-	//initLog() //comment while testing
+	}*/
+	initLog() //comment while testing
 	config := core.LoadConfig()
-	loadVkServiceKey()
-	go UpdateSection(config, newsHandler)
-
-	processing(config)
+	//loadVkServiceKey()
+	//go UpdateSection(config, newsHandler)
+	tgbot.Processing(config)
+	//processing(config)
 }
 
 func initLog() {
@@ -74,6 +74,15 @@ func UpdateSection(config *core.Config, newsHandler func(*core.Users, []news.New
 	go save(config, 20*time.Second, 5*time.Minute)
 
 	go sitesUpdate(config.Sites, 45*time.Second, newsHandler)
+
+	go scheduleUpdate(config.Schedule, time.Hour)
+}
+
+func scheduleUpdate(schedule *nsuschedule.Schedule, duration time.Duration) {
+	for {
+		schedule.Update()
+		time.Sleep(duration)
+	}
 }
 
 func weatherUpdate(weather *nsuweather.Weather, duration time.Duration) {

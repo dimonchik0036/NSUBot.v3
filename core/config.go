@@ -31,9 +31,10 @@ func NewConfig() (config Config) {
 
 func LoadConfig() *Config {
 	return &Config{
-		Users:   loadUsers(),
-		Weather: loadWeather(),
-		Sites:   loadSites(),
+		Users:    loadUsers(),
+		Weather:  loadWeather(),
+		Sites:    loadSites(),
+		Schedule: loadSchedule(),
 	}
 }
 
@@ -43,12 +44,14 @@ func (c *Config) Save() {
 	saveWeather(c.Weather)
 	saveUsers(c.Users)
 	saveSites(c.Sites)
+	saveSchedule(c.Schedule)
 }
 
 func (c *Config) Reset() {
 	saveWeather(c.Weather)
 	saveUsers(c.Users)
 	saveSites(c.Sites)
+	saveSchedule(c.Schedule)
 	c.Mux.Lock()
 	log.Print("Выключаюсь")
 	os.Exit(0)
@@ -78,6 +81,14 @@ func saveUsers(users *Users) {
 	users.Mux.RLock()
 	defer users.Mux.RUnlock()
 	if err := saveAndMarshal("users.json", users); err != nil {
+		log.Print(err)
+	}
+}
+
+func saveSchedule(schedule *nsuschedule.Schedule) {
+	schedule.Mux.RLock()
+	defer schedule.Mux.RUnlock()
+	if err := saveAndMarshal("schedule.json", schedule); err != nil {
 		log.Print(err)
 	}
 }
@@ -113,6 +124,16 @@ func loadUsers() *Users {
 	}
 
 	return &u
+}
+
+func loadSchedule() *nsuschedule.Schedule {
+	var s nsuschedule.Schedule
+	if err := loadAndUnmarshal("schedule.json", &s); err != nil {
+		log.Print(err)
+		return &nsuschedule.Schedule{}
+	}
+
+	return &s
 }
 
 func loadWeather() *nsuweather.Weather {

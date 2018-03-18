@@ -6,10 +6,12 @@ import (
 )
 
 const (
-	strCmdMainMenu   = "menu"
-	strCmdSiteMenu   = "m_si"
-	strCmdSubMenu    = "m_su"
-	strCmdOptionMenu = "m_opt"
+	strCmdMainMenu     = "menu"
+	strCmdSiteMenu     = "m_si"
+	strCmdSubMenu      = "m_su"
+	strCmdOptionMenu   = "m_opt"
+	strCmdScheduleMenu = "m_sch"
+	strCmdLabelsMenu   = "m_lb"
 )
 const (
 	backButtonText = "« Назад"
@@ -22,6 +24,9 @@ func mainMenuCommand(user *core.User, command *core.Command) {
 			tgbotapi.NewInlineKeyboardButtonData("Температура", addCommand(strCmdWeather, "")),
 		),
 		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("Расписание", addCommand(strCmdScheduleMenu, "")),
+		),
+		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData("Управление подписками", addCommand(strCmdSubMenu, "")),
 		),
 		tgbotapi.NewInlineKeyboardRow(
@@ -30,6 +35,19 @@ func mainMenuCommand(user *core.User, command *core.Command) {
 	)
 
 	sendMessage(user, command, "Главное меню", &markup)
+}
+
+func scheduleMenuCommand(user *core.User, command *core.Command) {
+	markup := tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("На сегодня", addCommand(strCmdGetSchedule, "0")), tgbotapi.NewInlineKeyboardButtonData("На завтра", addCommand(strCmdGetSchedule, "1"))),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("На всю неделю", addCommand(strCmdGetSchedule, "-1"))),
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData(backButtonText, addCommand(strCmdMainMenu, ""))),
+	)
+
+	sendMessage(user, command, "Расписание", &markup)
 }
 
 func optionMenuCommand(user *core.User, command *core.Command) {

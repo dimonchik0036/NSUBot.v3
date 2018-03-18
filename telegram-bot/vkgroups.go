@@ -78,6 +78,7 @@ func addVkSite(domain string, title string) error {
 			return errors.New("Уже существует")
 		}
 	}
+
 	vkGroupSites.Groups = append(vkGroupSites.Groups, site.Site)
 	tgSites.AddSite(&site)
 	return nil

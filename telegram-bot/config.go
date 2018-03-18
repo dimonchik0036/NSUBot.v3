@@ -65,11 +65,15 @@ func sendMessage(user *core.User, command *core.Command, text string, markup *tg
 	id := checkCallback(command.Args)
 	if id != 0 {
 		msg := tgbotapi.NewEditMessageText(user.ID, id, text)
-		msg.ReplyMarkup = markup
+		if markup != nil {
+			msg.ReplyMarkup = markup
+		}
 		tgBot.Send(msg)
 	} else {
 		msg := tgbotapi.NewMessage(user.ID, text)
-		msg.ReplyMarkup = markup
+		if markup != nil {
+			msg.ReplyMarkup = markup
+		}
 		tgBot.Send(msg)
 	}
 }

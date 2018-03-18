@@ -6,6 +6,7 @@ import (
 	"github.com/go-telegram-bot-api/telegram-bot-api"
 	"strconv"
 	"strings"
+	"time"
 )
 
 const (
@@ -23,11 +24,14 @@ const (
 )
 
 const (
-	strCmdWeather  = "weather"
-	strCmdShowSite = "sh"
-	strCmdFeedback = "feedback"
-	strCmdStart    = "start"
-	strCmdHelp     = "help"
+	strCmdWeather     = "weather"
+	strCmdShowSite    = "sh"
+	strCmdFeedback    = "feedback"
+	strCmdStart       = "start"
+	strCmdHelp        = "help"
+	strCmdSchedule    = "schedule"
+	strCmdAddLb       = "addlb"
+	strCmdGetSchedule = "day"
 )
 
 var tgCommands core.Handlers
@@ -45,11 +49,91 @@ func initCommands() {
 	tgCommands.AddHandler(core.Handler{Handler: siteMenuCommand}, strCmdSiteMenu)
 	tgCommands.AddHandler(core.Handler{Handler: showSiteCommand}, strCmdShowSite)
 	tgCommands.AddHandler(core.Handler{Handler: feedbackCommand}, strCmdFeedback)
+	tgCommands.AddHandler(core.Handler{Handler: scheduleMenuCommand}, strCmdScheduleMenu)
+	tgCommands.AddHandler(core.Handler{Handler: getScheduleCommand}, strCmdGetSchedule)
 
 	initAdminCommands()
 	initVipCommands()
 	initBotNewsCommand()
 	initVkSiteCommand()
+}
+
+func getScheduleCommand(user *core.User, command *core.Command) {
+	if command.GetArg("day") == "" {
+		day, _ := strconv.Atoi(command.GetArg(strCmdArg))
+		command.SetArg("day", strconv.Itoa(day))
+	}
+
+	group := command.GetArg("group")
+	if group == "" {
+		tgBot.Send(tgbotapi.NewMessage(user.ID, "Введите группу"))
+		user.ContinuationCommand = true
+		user.CurrentCommand = command
+		command.FieldNames = []string{"group"}
+		return
+	}
+	markup := tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData(backButtonText, addCommand(strCmdScheduleMenu, "")),
+			tgbotapi.NewInlineKeyboardButtonData(mainButtonText, addCommand(strCmdMainMenu, "")),
+		),
+	)
+	day, _ := strconv.Atoi(command.GetArg("day"))
+	var flag bool
+	var text string
+	if day < 0 {
+		group, ok := tgSchedule.GetGroup(group)
+		var data [6]string
+		if ok && len(group) > 5 {
+			flag = ok
+			data[0] = "Понедельник.\n" + group[0]
+			data[1] = "Вторник.\n" + group[1]
+			data[2] = "Среда.\n" + group[2]
+			data[3] = "Четверг.\n" + group[3]
+			data[4] = "Пятница.\n" + group[4]
+			data[5] = "Суббота.\n" + group[5]
+
+			for _, g := range data {
+				tgBot.Send(tgbotapi.NewMessage(user.ID, g))
+			}
+			msg := tgbotapi.NewMessage(user.ID, "Готово")
+			msg.ReplyMarkup = markup
+			tgBot.Send(msg)
+		}
+	} else {
+		t := int(time.Now().Weekday()) + day + 6
+		text, flag = tgSchedule.GetDay(group, t)
+		switch t {
+		case 0:
+			text = "Понедельник.\n" + text
+		case 1:
+			text = "Вторник.\n" + text
+		case 2:
+			text = "Среда.\n" + text
+		case 3:
+			text = "Четверг.\n" + text
+		case 4:
+			text = "Пятница.\n" + text
+		case 5:
+			text = "Суббота.\n" + text
+		case 6:
+			text = "Воскресенье.\n" + text
+		}
+	}
+
+	if !flag {
+		tgBot.Send(tgbotapi.NewMessage(user.ID, "Неверная группа, введите другую группу"))
+		user.ContinuationCommand = true
+		user.CurrentCommand = command
+		command.FieldNames = []string{"group"}
+		return
+	}
+
+	if day >= 0 {
+		msg := tgbotapi.NewMessage(user.ID, text)
+		msg.ReplyMarkup = markup
+		tgBot.Send(msg)
+	}
 }
 
 func startCommand(user *core.User, command *core.Command) {
